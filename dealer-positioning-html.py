@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 from html import escape
 
-REPORTS = Path(__file__).resolve().parent / 'reports'
+REPORTS = Path(__file__).resolve().parents[1] / 'reports'
 DATA = REPORTS / 'dealer-data.json'
 OUT = REPORTS / 'dealer-positioning.html'
 
@@ -60,6 +60,85 @@ def fmt_pct(x, signed=True):
         x = 0.0
     sign = '+' if (signed and x >= 0) else ''
     return f'{sign}{x:.2f}%' if x else '0.00%'
+
+
+def parse_moneyness_bucket(label: str):
+    """Map moneyness bucket label → (lo_pct, hi_pct) half-open range matching pipeline int(pct) bins."""
+    if label == '<-5%':
+        return (None, -5.0)
+    if label == '>+5%':
+        return (5.0, None)
+    s = label.replace('%', '').replace('+', '')
+    try:
+        p = int(s)
+    except ValueError:
+        return (None, None)
+    if p >= 0:
+        return (float(p), float(p + 1))
+    # negative bins: int(pct) == p for p-1 < pct <= p? Python int truncates toward 0.
+    # int(-3.0)=-3, int(-3.999)=-3, int(-4.0)=-4 → (-4, -3]
+    return (float(p - 1), float(p))
+
+
+def moneyness_strike_labels(label: str, spot: float | None) -> dict:
+    """Human labels for a moneyness bucket. Strike is primary; percent is secondary."""
+    if not spot or spot <= 0:
+        return {
+            'strike': label,
+            'pct': label,
+            'tip': label,
+            'lo': '',
+            'hi': '',
+            'mid': '',
+        }
+    lo_p, hi_p = parse_moneyness_bucket(label)
+    if lo_p is None and hi_p is not None:
+        edge = spot * (1.0 + hi_p / 100.0)
+        strike = f'<{edge:,.0f}'
+        tip = f'below {edge:,.0f} ({label})'
+        return {
+            'strike': strike,
+            'pct': label,
+            'tip': tip,
+            'lo': '',
+            'hi': f'{edge:.2f}',
+            'mid': f'{edge:.2f}',
+        }
+    if hi_p is None and lo_p is not None:
+        edge = spot * (1.0 + lo_p / 100.0)
+        strike = f'>{edge:,.0f}'
+        tip = f'above {edge:,.0f} ({label})'
+        return {
+            'strike': strike,
+            'pct': label,
+            'tip': tip,
+            'lo': f'{edge:.2f}',
+            'hi': '',
+            'mid': f'{edge:.2f}',
+        }
+    if lo_p is None or hi_p is None:
+        return {
+            'strike': label,
+            'pct': label,
+            'tip': label,
+            'lo': '',
+            'hi': '',
+            'mid': '',
+        }
+    lo = spot * (1.0 + lo_p / 100.0)
+    hi = spot * (1.0 + hi_p / 100.0)
+    mid = (lo + hi) / 2.0
+    # Closed bucket ends look better as inclusive price band for traders.
+    strike = f'{lo:,.0f}–{hi:,.0f}'
+    tip = f'{lo:,.0f}–{hi:,.0f} ({label} vs spot {spot:,.0f})'
+    return {
+        'strike': strike,
+        'pct': label,
+        'tip': tip,
+        'lo': f'{lo:.2f}',
+        'hi': f'{hi:.2f}',
+        'mid': f'{mid:.2f}',
+    }
 
 
 def narrative_base_state(d):
@@ -201,11 +280,13 @@ def heat_color(val, max_abs):
     return f'rgba(180,100,80,{alpha:.2f})', '#d8d8d8'
 
 
-def build_heatmap_rows(surface, metric, opex_bucket):
+def build_heatmap_rows(surface, metric, opex_bucket, spot=None):
     cells = surface.get('cells', {})
     dte_buckets = surface.get('dte_buckets', list(DTE_LABELS.keys()))
     m_buckets = surface.get('moneyness_buckets', [])
     atm = surface.get('atm_bucket', '0%')
+    if spot is None:
+        spot = surface.get('spot')
 
     values = []
     for dte in dte_buckets:
@@ -217,6 +298,7 @@ def build_heatmap_rows(surface, metric, opex_bucket):
     rows = []
     for m in reversed(m_buckets):
         is_atm = m == atm
+        labels = moneyness_strike_labels(m, spot)
         cells_html = []
         for dte in dte_buckets:
             cell = cells.get(dte, {}).get(m, {})
@@ -229,7 +311,7 @@ def build_heatmap_rows(surface, metric, opex_bucket):
                 bg, fg = heat_color(val, max_abs)
                 display = fmt_b(val)
             opex_mark = ' opex-col' if dte == opex_bucket else ''
-            tip = (f'{m} / {dte} · {metric.upper()}: {display}'
+            tip = (f'{labels["tip"]} / {dte} · {metric.upper()}: {display}'
                    f' · GEX {fmt_b(cell.get("gex",0)/1e9)}'
                    f' · dGEX {fmt_b(cell.get("dgex",0)/1e9)}'
                    f' · Vanna {fmt_b(cell.get("vanna",0)/1e9)}'
@@ -242,20 +324,37 @@ def build_heatmap_rows(surface, metric, opex_bucket):
                 f'style="background:{bg};color:{fg}" title="{escape(tip)}">{display}</td>'
             )
         atm_label = ' atm-row' if is_atm else ''
+        row_label = (
+            f'<th class="hm-sticky{atm_label}" title="{escape(labels["tip"])}">'
+            f'<span class="m-label" data-strike="{escape(labels["strike"])}" data-pct="{escape(labels["pct"])}">'
+            f'<span class="m-strike">{escape(labels["strike"])}</span>'
+            f'<span class="m-pct">{escape(labels["pct"])}</span>'
+            f'</span></th>'
+        )
         rows.append(
-            f'<tr class="{atm_label.strip()}"><th class="hm-sticky{atm_label}">{escape(m)}</th>'
+            f'<tr class="{atm_label.strip()}">{row_label}'
             + ''.join(cells_html) + '</tr>'
         )
     return rows, max_abs
 
 
-def build_reaction_map(matrix):
+def build_reaction_map(matrix, spot=None):
     if not matrix or 'cells' not in matrix:
         return '<p class="muted">Scenario matrix unavailable.</p>', ''
     spot_cols = matrix.get('spot_shocks_pct', [-2, 0, 2])
     iv_rows = matrix.get('iv_shocks_pt', [5, 0, -5])
     cells = matrix['cells']
-    header = ''.join(f'<th>Spot {s:+d}%</th>' for s in spot_cols)
+    header_bits = []
+    for s in spot_cols:
+        if spot:
+            px = spot * (1.0 + s / 100.0)
+            header_bits.append(
+                f'<th><span class="rx-spot-px">{px:,.0f}</span>'
+                f'<span class="rx-spot-pct">Spot {s:+d}%</span></th>'
+            )
+        else:
+            header_bits.append(f'<th>Spot {s:+d}%</th>')
+    header = ''.join(header_bits)
     body_rows = []
     for i, iv_pt in enumerate(iv_rows):
         row_cells = []
@@ -390,12 +489,12 @@ def build_html(d):
     opex_bucket = surface.get('opex_bucket', '0-7d')
     matrix = d.get('scenario_matrix') or {}
 
-    hm_rows, _ = build_heatmap_rows(surface, 'gex', opex_bucket)
+    hm_rows, _ = build_heatmap_rows(surface, 'gex', opex_bucket, spot=spot)
     dte_headers = ''.join(
         f'<th class="{"opex-col" if t == opex_bucket else ""}">{escape(DTE_LABELS.get(t, t))}</th>'
         for t in surface.get('dte_buckets', list(DTE_LABELS.keys()))
     )
-    rx_table, rx_note = build_reaction_map(matrix)
+    rx_table, rx_note = build_reaction_map(matrix, spot=spot)
 
     evidence_items = ''.join(
         f'<li><a href="{escape(url)}" target="_blank" rel="noopener">{escape(lbl)}</a></li>'
@@ -496,24 +595,41 @@ def build_html(d):
   .panel-h .note {{ color: #777; font-weight: 400; text-transform: none; letter-spacing: 0; }}
   .panel-b {{ padding: 10px 12px; }}
 
-  .metric-btns {{ display: flex; gap: 4px; }}
+  .metric-btns {{ display: flex; gap: 4px; flex-wrap: wrap; }}
   .metric-btns button {{
     background: #1a1a1a; border: 1px solid #333; color: #888; font-size: 10px;
     min-height: 36px; min-width: 54px; padding: 7px 10px; cursor: pointer; font-family: inherit;
   }}
   .metric-btns button.active {{ border-color: #d4a017; color: #d4a017; background: #1a1608; }}
+  .axis-btns {{ display: flex; gap: 4px; }}
+  .axis-btns button {{
+    background: #1a1a1a; border: 1px solid #333; color: #888; font-size: 10px;
+    min-height: 36px; min-width: 54px; padding: 7px 10px; cursor: pointer; font-family: inherit;
+  }}
+  .axis-btns button.active {{ border-color: #d4a017; color: #d4a017; background: #1a1608; }}
 
   .hm-scroll {{ overflow-x: auto; -webkit-overflow-scrolling: touch; }}
   .hm-table {{ border-collapse: collapse; width: max-content; min-width: 100%; font-size: 11px; }}
   .hm-table th, .hm-table td {{ padding: 4px 6px; text-align: right; border: 1px solid #1e1e1e; }}
   .hm-sticky {{
     position: sticky; left: 0; z-index: 2; background: #0e0e0e; text-align: left !important;
-    color: #999; min-width: 52px;
+    color: #999; min-width: 88px;
   }}
+  .m-label {{ display: flex; flex-direction: column; gap: 1px; line-height: 1.15; }}
+  .m-strike {{ color: #d8d8d8; font-variant-numeric: tabular-nums; font-size: 11px; }}
+  .m-pct {{ color: #666; font-size: 10px; font-variant-numeric: tabular-nums; }}
+  body.axis-pct .m-strike {{ display: none; }}
+  body.axis-pct .m-pct {{ color: #d8d8d8; font-size: 11px; }}
+  body.axis-strike .m-pct {{ display: none; }}
   .hm-cell {{ min-width: 58px; font-size: 10px; }}
   .atm-row .hm-sticky, .atm-row td {{ box-shadow: inset 0 1px 0 #d4a01744, inset 0 -1px 0 #d4a01744; }}
   .opex-col {{ box-shadow: inset 2px 0 0 #d4a01755; }}
   thead .opex-col {{ color: #d4a017; }}
+  .rx-spot-px {{ display: block; color: #d8d8d8; font-variant-numeric: tabular-nums; }}
+  .rx-spot-pct {{ display: block; color: #666; font-size: 10px; margin-top: 2px; }}
+  body.axis-pct .rx-spot-px {{ display: none; }}
+  body.axis-pct .rx-spot-pct {{ color: #d8d8d8; font-size: 11px; }}
+  body.axis-strike .rx-spot-pct {{ display: none; }}
 
   .rx-table {{ width: 100%; border-collapse: collapse; font-size: 11px; }}
   .rx-table th, .rx-table td {{ border: 1px solid #222; padding: 8px; text-align: center; vertical-align: middle; }}
@@ -597,7 +713,9 @@ def build_html(d):
     .panel-h {{ min-height: 46px; padding: 8px 10px; }}
     .panel-b {{ padding: 10px; }}
     .metric-btns button {{ min-height: 44px; min-width: 62px; font-size: 11px; }}
+    .axis-btns button {{ min-height: 44px; min-width: 62px; font-size: 11px; }}
     .hm-table {{ min-width: 620px; font-size: 11px; }}
+    .hm-sticky {{ min-width: 96px; }}
     .hm-table th, .hm-table td {{ padding: 6px 8px; }}
     .hm-cell {{ min-width: 70px; font-size: 11px; }}
     .rx-table th, .rx-table td {{ padding: 10px 4px; }}
@@ -667,20 +785,26 @@ def build_html(d):
     <div class="panel">
     <div class="panel-h">
       <span>노출 표면 · Exposure surface</span>
-      <div class="metric-btns">
-        <button type="button" class="active" data-metric="gex">GEX</button>
-        <button type="button" data-metric="dgex">dGEX</button>
-        <button type="button" data-metric="vanna">Vanna</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <div class="axis-btns" role="group" aria-label="Axis unit">
+          <button type="button" class="active" data-axis="strike">가격</button>
+          <button type="button" data-axis="pct">%</button>
+        </div>
+        <div class="metric-btns">
+          <button type="button" class="active" data-metric="gex">GEX</button>
+          <button type="button" data-metric="dgex">dGEX</button>
+          <button type="button" data-metric="vanna">Vanna</button>
+        </div>
       </div>
     </div>
     <div class="panel-b hm-scroll">
       <table class="hm-table" id="heatmap">
-        <thead><tr><th class="hm-sticky">Moneyness</th>{dte_headers}</tr></thead>
+        <thead><tr><th class="hm-sticky" id="hm-y-label">행사가</th>{dte_headers}</tr></thead>
         <tbody id="hm-body">
           {''.join(hm_rows)}
         </tbody>
       </table>
-      <p class="muted" style="margin-top:8px">Y = moneyness vs spot · X = DTE bucket · amber row = ATM · amber column = OPEX bucket</p>
+      <p class="muted" style="margin-top:8px" id="hm-axis-note">Y = 실제 행사가 구간 (현물 대비) · X = 만기 구간 · amber row = ATM · amber column = OPEX</p>
     </div>
   </div>
   </div>
@@ -754,9 +878,34 @@ def build_html(d):
     }});
   }}
 
+  function applyAxis(axis) {{
+    document.body.classList.remove('axis-strike', 'axis-pct');
+    document.body.classList.add(axis === 'pct' ? 'axis-pct' : 'axis-strike');
+    document.querySelectorAll('.axis-btns button').forEach(function(btn) {{
+      btn.classList.toggle('active', btn.getAttribute('data-axis') === axis);
+    }});
+    var y = document.getElementById('hm-y-label');
+    var note = document.getElementById('hm-axis-note');
+    if (y) y.textContent = axis === 'pct' ? 'Moneyness' : '행사가';
+    if (note) {{
+      note.textContent = axis === 'pct'
+        ? 'Y = 현물 대비 % · X = 만기 구간 · amber row = ATM · amber column = OPEX'
+        : 'Y = 실제 행사가 구간 (현물 대비) · X = 만기 구간 · amber row = ATM · amber column = OPEX';
+    }}
+    try {{ localStorage.setItem('dealer-axis-unit', axis); }} catch (e) {{}}
+  }}
+
   document.querySelectorAll('.metric-btns button').forEach(function(btn) {{
     btn.addEventListener('click', function() {{ applyMetric(btn.getAttribute('data-metric')); }});
   }});
+  document.querySelectorAll('.axis-btns button').forEach(function(btn) {{
+    btn.addEventListener('click', function() {{ applyAxis(btn.getAttribute('data-axis')); }});
+  }});
+
+  var saved = 'strike';
+  try {{ saved = localStorage.getItem('dealer-axis-unit') || 'strike'; }} catch (e) {{}}
+  applyAxis(saved === 'pct' ? 'pct' : 'strike');
+
   if (window.matchMedia('(max-width: 800px)').matches) {{
     var raw = document.querySelector('details.raw-data');
     if (raw) raw.removeAttribute('open');
