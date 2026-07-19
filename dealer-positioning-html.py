@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 from html import escape
 
-REPORTS = Path(__file__).resolve().parents[1] / 'reports'
+REPORTS = Path(__file__).resolve().parent / 'reports'
 DATA = REPORTS / 'dealer-data.json'
 OUT = REPORTS / 'dealer-positioning.html'
 
