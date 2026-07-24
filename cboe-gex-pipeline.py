@@ -195,7 +195,10 @@ def compute_profile(raw):
     by_expiry = defaultdict(lambda: {
         'call_gex': 0.0, 'put_gex': 0.0, 'call_dgex': 0.0, 'put_dgex': 0.0,
         'call_vex': 0.0, 'put_vex': 0.0, 'call_vanna': 0.0, 'put_vanna': 0.0,
+        'call_oi': 0.0, 'put_oi': 0.0, 'gamma_oi': 0.0,
     })
+    # Per-strike within expiry: for 0DTE intraday-magnet pin detection.
+    by_strike_exp = defaultdict(lambda: defaultdict(float))  # key="EXP|strike" -> gamma_oi
     dealer_surface = init_dealer_surface()
 
     parsed_count = 0
@@ -273,6 +276,14 @@ def compute_profile(raw):
             surf['dgex'] += dgex_val if typ == 'C' else -dgex_val
             surf['active'] += 1
             parsed_count += 1
+            # 0DTE intraday-magnet accumulators: pin strength = |gamma*OI| at this strike
+            if dte == 0:
+                ed['gamma_oi'] += abs(gamma) * oi
+                if typ == 'C':
+                    ed['call_oi'] += oi
+                else:
+                    ed['put_oi'] += oi
+                by_strike_exp[f"{key}|{strike}"][typ] += abs(gex_val)
         except:
             continue
 
@@ -379,6 +390,25 @@ def compute_profile(raw):
     opex_bucket = classify_dte_bucket(days_to_opex)
     scenario_matrix = build_scenario_matrix(net_gex, net_vanna, spot)
 
+    # 0DTE intraday magnet: strongest pin (|gamma*OI|) strike within nearest expiry only.
+    zero_dte = {}
+    if nearest:
+        nk = str(nearest)
+        zd = {float(strike): float(vals.get('C', 0.0) + vals.get('P', 0.0))
+              for kkey, vals in by_strike_exp.items()
+              if kkey.startswith(nk + '|') and (strike := kkey.split('|', 1)[1])}
+        if zd:
+            pin_strike = max(zd, key=lambda s: zd[s])
+            e = by_expiry.get(nk, {})
+            zero_dte = {
+                'expiry': nk,
+                'pin_strike': float(pin_strike),
+                'pin_strength_b': round(zd[pin_strike] / 1e9, 2),
+                'call_oi': int(e.get('call_oi', 0)),
+                'put_oi': int(e.get('put_oi', 0)),
+                'net_gex_b': round(e.get('call_gex', 0.0) / 1e9 - e.get('put_gex', 0.0) / 1e9, 2),
+                'note': 'Intraday magnet — decays toward close; OI is T+1 delayed. Not a fixed wall.',
+            }
     assumptions = {
         'data_source': 'CBOE SPX delayed option chain (~20 min lag)',
         'oi_lag': 'Open interest typically T+1; not intraday flow',
@@ -445,6 +475,7 @@ def compute_profile(raw):
         'near_call_wall': near_call_wall,
         'near_put_wall': near_put_wall,
         'nearest_exp': str(nearest) if nearest else None,
+        'zero_dte': zero_dte,
         'opex_date': str(opex_date),
         'days_to_opex': days_to_opex,
         'top_strikes': [(s, round(g/1e9, 2), co, po) for s, g, co, po in top_list],

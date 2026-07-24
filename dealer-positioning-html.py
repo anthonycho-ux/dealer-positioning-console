@@ -443,6 +443,11 @@ def build_levels_bar(d):
     ]:
         if price:
             grouped.setdefault(float(price), []).append(label)
+    # 0DTE intraday magnet — shown as its own level, not a fixed wall.
+    zd = d.get('zero_dte') or {}
+    zd_strike = zd.get('pin_strike')
+    if zd_strike:
+        grouped.setdefault(float(zd_strike), []).append('0DTE magnet')
     levels = list(grouped.items())
     if not levels:
         return ''
@@ -455,7 +460,11 @@ def build_levels_bar(d):
         joined = ' · '.join(labels)
         if labels == ['call wall', 'near call', 'near put', 'put wall']:
             joined = 'call/put walls · near walls'
-        if 'spot' in labels:
+        if '0DTE magnet' in labels:
+            kind = 'magnet'
+            joined = (f"0DTE magnet {fmt_price(price)} "
+                      f"({fmt_b(zd.get('pin_strength_b'))} pin · net {fmt_b(zd.get('net_gex_b'))} GEX)")
+        elif 'spot' in labels:
             kind = 'spot'
         elif 'gamma flip' in labels:
             kind = 'flip'
@@ -653,6 +662,8 @@ def build_html(d):
   .lv-line.lv-mixed {{ background: #8c7a52; }}
   .lv-line.lv-call {{ background: #b46450; }}
   .lv-line.lv-put {{ background: #5a8fb0; }}
+  .lv-line.lv-magnet {{ background: repeating-linear-gradient(90deg, #d4a017 0 4px, transparent 4px 9px); height: 2px; }}
+  .lv-desc .zd-tag {{ color: #d4a017; }}
   .lv-lbl {{ color: #ccc; font-weight: 600; }}
   .lv-desc {{ color: #666; }}
 
