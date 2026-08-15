@@ -1,0 +1,51 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LIVE DEALER GAMMA INFERENCE - DEMO</title>
+<style>
+:root{--bg:#0e0e0e;--panel:#161616;--line:#2a2a2a;--amber:#d4a017;
+ --rust:rgba(180,100,80,.9);--pos:rgba(90,143,176,.8);
+ --txt:#cfcfcf;--dim:#8a8a8a;--mono:'SFMono-Regular',Consolas,monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);
+ font-family:-apple-system,system-ui,'Apple SD Gothic Neo',sans-serif;padding:28px 18px 60px}
+h1{font-size:19px;font-weight:600;margin:0 0 2px}
+.sub{color:var(--dim);font-size:12.5px;margin-bottom:20px}
+.kpis{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+.kpi{flex:1 1 150px;background:var(--panel);border:1px solid var(--line);
+ border-radius:10px;padding:14px 16px}
+.kpi .n{font-family:var(--mono);font-size:11px;color:var(--amber);margin-bottom:6px}
+.kpi .v{font-size:22px;font-weight:700;font-family:var(--mono)}
+.sec{margin:28px 0 12px;font-size:12.5px;color:var(--amber);
+ text-transform:uppercase;letter-spacing:1.4px}
+.r{display:flex;align-items:center;gap:12px;margin:9px 0}
+.lab{width:54px;font-family:var(--mono);font-size:12.5px;color:var(--dim);text-align:right}
+.track{flex:1;background:#1c1c1c;border-radius:5px;height:30px;position:relative;overflow:hidden}
+.fill{position:absolute;left:0;top:0;height:100%}
+.base-outline{position:absolute;left:0;top:0;height:100%;border:1px solid #6a6a6a;background:transparent}
+.neg{background:linear-gradient(90deg,#7a4a3a,var(--rust))}
+.pos{background:linear-gradient(90deg,#3a5566,var(--pos))}
+.val{width:86px;font-family:var(--mono);font-size:12px;text-align:right}
+.svg{width:100%;height:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-top:6px}
+.svg polyline{fill:none;stroke:var(--amber);stroke-width:2}
+.svg .ax{fill:var(--dim);font-size:11px;font-family:var(--mono)}
+.foot{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);
+ color:var(--dim);font-size:11.5px;line-height:1.6}
+.tag{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--amber);
+ border:1px solid var(--line);border-radius:4px;padding:2px 6px;margin-right:6px}
+</style></head><body>
+<h1>LIVE DEALER GAMMA INFERENCE - DEMO</h1>
+<div class="sub">SIMULATED tape-based inference - account/cost 0 - CEM-INSPIRED proxy</div>
+<div class="kpis">
+ <div class="kpi"><div class="n">SPOT</div><div class="v">7786</div></div>
+ <div class="kpi"><div class="n">BASELINE (prior OI)</div><div class="v">+0.87B</div></div>
+ <div class="kpi"><div class="n">LIVE estimate (tape)</div><div class="v">+0.87B</div></div>
+ <div class="kpi"><div class="n">DRIFT (delta)</div><div class="v">+0.00B</div></div>
+</div>
+<div class="sec">1. per-strike - prior vs live</div>
+<div class='r'><div class='lab'>7750</div><div class='track'><div class='base-outline' style='width:23.8%'></div><div class='fill pos' style='width:23.8%'></div></div><div class='val mono'>+0.05B</div></div><div class='r'><div class='lab'>7785</div><div class='track'><div class='base-outline' style='width:100.0%'></div><div class='fill pos' style='width:100.0%'></div></div><div class='val mono'>+0.21B</div></div><div class='r'><div class='lab'>7800</div><div class='track'><div class='base-outline' style='width:52.4%'></div><div class='fill pos' style='width:52.4%'></div></div><div class='val mono'>+0.11B</div></div><div class='r'><div class='lab'>7825</div><div class='track'><div class='base-outline' style='width:23.8%'></div><div class='fill pos' style='width:23.8%'></div></div><div class='val mono'>+0.05B</div></div><div class='r'><div class='lab'>7850</div><div class='track'><div class='base-outline' style='width:38.1%'></div><div class='fill pos' style='width:38.1%'></div></div><div class='val mono'>+0.08B</div></div><div class='r'><div class='lab'>7900</div><div class='track'><div class='base-outline' style='width:61.9%'></div><div class='fill pos' style='width:61.9%'></div></div><div class='val mono'>+0.13B</div></div><div class='r'><div class='lab'>7950</div><div class='track'><div class='base-outline' style='width:23.8%'></div><div class='fill pos' style='width:23.8%'></div></div><div class='val mono'>+0.05B</div></div><div class='r'><div class='lab'>8000</div><div class='track'><div class='base-outline' style='width:33.3%'></div><div class='fill pos' style='width:33.3%'></div></div><div class='val mono'>+0.07B</div></div><div class='r'><div class='lab'>8100</div><div class='track'><div class='base-outline' style='width:28.6%'></div><div class='fill pos' style='width:28.6%'></div></div><div class='val mono'>+0.06B</div></div><div class='r'><div class='lab'>8200</div><div class='track'><div class='base-outline' style='width:28.6%'></div><div class='fill pos' style='width:28.6%'></div></div><div class='val mono'>+0.06B</div></div>
+<div class="sec">2. intraday Net GEX drift</div>
+<div class='sub'>no trajectory steps</div>
+<div class="foot">
+ <span class="tag">CEM-INSPIRED</span> Dealer book is not a wall but a moving staircase on a ship in a storm.
+ Prior OI is the sand weight measured at dock; the trade tape is the crew shoveling.
+ Generated: 2026-08-15T04:08:44 - prints 11916 - source: tape /home/dev/.hermes/data/dealer-tape.jsonl — CEM-INSPIRED proxy, not observed dealer inventory.
+</div></body></html>

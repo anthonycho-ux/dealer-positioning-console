@@ -1,0 +1,284 @@
+{
+ "spot": 7785.7598,
+ "generated_at": "2026-08-15T04:08:44",
+ "baseline_net_gex_b": 0.87,
+ "live_net_gex_b": 0.87,
+ "delta_net_gex_b": 0.0,
+ "prints_total": 11916,
+ "source_label": "tape /home/dev/.hermes/data/dealer-tape.jsonl",
+ "strikes": [
+  {
+   "strike": 7785.0,
+   "baseline_gex_b": 0.21,
+   "live_gex_b": 0.21,
+   "oi": 26302.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7900.0,
+   "baseline_gex_b": 0.13,
+   "live_gex_b": 0.13,
+   "oi": 186974.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7800.0,
+   "baseline_gex_b": 0.11,
+   "live_gex_b": 0.11,
+   "oi": 250296.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7850.0,
+   "baseline_gex_b": 0.08,
+   "live_gex_b": 0.08,
+   "oi": 81384.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 8000.0,
+   "baseline_gex_b": 0.07,
+   "live_gex_b": 0.07,
+   "oi": 1799256.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 8100.0,
+   "baseline_gex_b": 0.06,
+   "live_gex_b": 0.06,
+   "oi": 182952.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 8200.0,
+   "baseline_gex_b": 0.06,
+   "live_gex_b": 0.06,
+   "oi": 194336.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7950.0,
+   "baseline_gex_b": 0.05,
+   "live_gex_b": 0.05,
+   "oi": 78254.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7750.0,
+   "baseline_gex_b": 0.05,
+   "live_gex_b": 0.05,
+   "oi": 153300.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7825.0,
+   "baseline_gex_b": 0.05,
+   "live_gex_b": 0.05,
+   "oi": 52152.0,
+   "delta_gex_b": 0.0
+  }
+ ],
+ "trajectory": [],
+ "tape_sample": [
+  {
+   "i": 6176,
+   "strike": 7420.0,
+   "exp": "20260728",
+   "side": "call",
+   "cust_buy": false,
+   "vol": 1,
+   "ts": "2026-07-28T04:16:06",
+   "last_vs_mid": -0.606
+  },
+  {
+   "i": 6177,
+   "strike": 7450.0,
+   "exp": "20260728",
+   "side": "put",
+   "cust_buy": true,
+   "vol": 1,
+   "ts": "2026-07-28T04:16:13",
+   "last_vs_mid": 1.304
+  },
+  {
+   "i": 6178,
+   "strike": 7410.0,
+   "exp": "20260728",
+   "side": "put",
+   "cust_buy": true,
+   "vol": 1,
+   "ts": "2026-07-28T04:16:17",
+   "last_vs_mid": 1.381
+  },
+  {
+   "i": 6179,
+   "strike": 7450.0,
+   "exp": "20260728",
+   "side": "call",
+   "cust_buy": false,
+   "vol": 1,
+   "ts": "2026-07-28T04:16:17",
+   "last_vs_mid": -3.333
+  },
+  {
+   "i": 6180,
+   "strike": 7425.0,
+   "exp": "20260728",
+   "side": "call",
+   "cust_buy": false,
+   "vol": 1,
+   "ts": "2026-07-28T04:16:20",
+   "last_vs_mid": -2.098
+  },
+  {
+   "i": 6181,
+   "strike": 7415.0,
+   "exp": "20260728",
+   "side": "put",
+   "cust_buy": true,
+   "vol": 5,
+   "ts": "2026-07-28T04:16:28",
+   "last_vs_mid": 0.36
+  },
+  {
+   "i": 6182,
+   "strike": 7400.0,
+   "exp": "20260728",
+   "side": "put",
+   "cust_buy": false,
+   "vol": 2,
+   "ts": "2026-07-28T04:16:46",
+   "last_vs_mid": -0.952
+  },
+  {
+   "i": 6183,
+   "strike": 7440.0,
+   "exp": "20260728",
+   "side": "call",
+   "cust_buy": false,
+   "vol": 1,
+   "ts": "2026-07-28T04:16:58",
+   "last_vs_mid": 0.0
+  },
+  {
+   "i": 6184,
+   "strike": 7415.0,
+   "exp": "20260728",
+   "side": "call",
+   "cust_buy": false,
+   "vol": 2,
+   "ts": "2026-07-28T04:17:00",
+   "last_vs_mid": -0.532
+  },
+  {
+   "i": 6185,
+   "strike": 7395.0,
+   "exp": "20260728",
+   "side": "put",
+   "cust_buy": true,
+   "vol": 10,
+   "ts": "2026-07-28T04:17:12",
+   "last_vs_mid": 1.047
+  },
+  {
+   "i": 6186,
+   "strike": 7400.0,
+   "exp": "20260728",
+   "side": "put",
+   "cust_buy": false,
+   "vol": 1,
+   "ts": "2026-07-28T04:17:35",
+   "last_vs_mid": -0.238
+  },
+  {
+   "i": 6187,
+   "strike": 7455.0,
+   "exp": "20260728",
+   "side": "call",
+   "cust_buy": true,
+   "vol": 1,
+   "ts": "2026-07-28T04:17:37",
+   "last_vs_mid": 2.083
+  },
+  {
+   "i": 6188,
+   "strike": 7410.0,
+   "exp": "20260728",
+   "side": "call",
+   "cust_buy": true,
+   "vol": 1,
+   "ts": "2026-07-28T04:17:46",
+   "last_vs_mid": 0.935
+  },
+  {
+   "i": 6189,
+   "strike": 7445.0,
+   "exp": "20260728",
+   "side": "call",
+   "cust_buy": false,
+   "vol": 1,
+   "ts": "2026-07-28T04:17:50",
+   "last_vs_mid": 0.0
+  },
+  {
+   "i": 6190,
+   "strike": 7405.0,
+   "exp": "20260728",
+   "side": "call",
+   "cust_buy": false,
+   "vol": 2,
+   "ts": "2026-07-28T04:18:19",
+   "last_vs_mid": -0.621
+  },
+  {
+   "i": 6191,
+   "strike": 7450.0,
+   "exp": "20260728",
+   "side": "call",
+   "cust_buy": false,
+   "vol": 1,
+   "ts": "2026-07-28T04:18:19",
+   "last_vs_mid": -0.84
+  },
+  {
+   "i": 6192,
+   "strike": 7400.0,
+   "exp": "20260728",
+   "side": "call",
+   "cust_buy": false,
+   "vol": 1,
+   "ts": "2026-07-28T04:18:22",
+   "last_vs_mid": -0.924
+  },
+  {
+   "i": 6193,
+   "strike": 7410.0,
+   "exp": "20260728",
+   "side": "put",
+   "cust_buy": true,
+   "vol": 1,
+   "ts": "2026-07-28T04:18:27",
+   "last_vs_mid": 0.197
+  },
+  {
+   "i": 6194,
+   "strike": 7395.0,
+   "exp": "20260728",
+   "side": "put",
+   "cust_buy": true,
+   "vol": 1,
+   "ts": "2026-07-28T04:18:31",
+   "last_vs_mid": 0.262
+  },
+  {
+   "i": 6195,
+   "strike": 7420.0,
+   "exp": "20260728",
+   "side": "put",
+   "cust_buy": true,
+   "vol": 1,
+   "ts": "2026-07-28T04:18:42",
+   "last_vs_mid": 0.824
+  }
+ ]
+}

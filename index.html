@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dealer Positioning · SPX v2</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0a0a; color: #c8c8c8;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 14px; line-height: 1.5; padding: 16px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  .mono { font-family: 'SF Mono', Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+  .muted { color: #666; font-size: 12px; }
+  .accent { color: #d4a017; }
+
+  header {
+    border-bottom: 1px solid #2a2a2a; padding-bottom: 10px; margin-bottom: 14px;
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline;
+  }
+  header h1 { font-size: 15px; font-weight: 650; color: #f0f0f0; letter-spacing: 0.03em; }
+  header .meta { font-size: 11px; color: #666; }
+
+  .decision-board { display: grid; grid-template-columns: 1.55fr 0.85fr; gap: 14px; margin-bottom: 14px; }
+  .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #292929; border: 1px solid #303030; }
+  .answer { background: #0e0e0e; padding: 14px 16px; min-height: 108px; }
+  .answer .eyebrow { display: block; color: #777; font-size: 10px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 7px; }
+  .answer strong { display: block; color: #ededed; font-size: 19px; line-height: 1.2; letter-spacing: -.02em; }
+  .answer p { margin-top: 7px; color: #888; font-size: 12px; }
+  .answer.now { border-left: 3px solid #d4a017; }
+  .answer.now.amplify strong { color: #e2b132; }
+  .answer.now.stabilize strong { color: #96afbf; }
+  .change-card { background: #0e0e0e; border: 1px solid #303030; padding: 14px 16px; display: flex; flex-direction: column; }
+  .change-card h2 { color: #999; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+  .change-card ol { list-style: none; counter-reset: changes; margin-top: 10px; }
+  .change-card li { position: relative; padding: 8px 0 8px 26px; border-bottom: 1px solid #202020; color: #d0d0d0; font-size: 13px; }
+  .change-card li::before { counter-increment: changes; content: counter(changes); position: absolute; left: 0; color: #d4a017; font-family: 'SF Mono', Menlo, monospace; }
+  .confidence { margin-top: auto; padding-top: 12px; color: #737373; font-size: 11px; }
+  .confidence b { display: inline-block; color: #c6c6c6; border: 1px solid #3a3a3a; padding: 3px 7px; margin-right: 6px; font-weight: 600; }
+
+  .narrative {
+    background: #0e0e0e; border: 1px solid #2a2a2a; padding: 10px 12px; margin-bottom: 14px;
+    font-size: 12px; color: #b0b0b0;
+  }
+  .narrative p { margin-bottom: 6px; }
+  .narrative p:last-child { margin-bottom: 0; }
+  .narrative .lbl { color: #888; text-transform: uppercase; font-size: 10px; letter-spacing: 0.06em; }
+
+  .strip {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px;
+    background: #222; border: 1px solid #2a2a2a; margin-bottom: 14px;
+  }
+  .strip .c { background: #0e0e0e; padding: 8px 10px; }
+  .strip .k { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 0.05em; }
+  .strip .v { font-size: 14px; color: #e8e8e8; margin-top: 2px; }
+  .strip .pos { color: #6a9aba; }
+  .strip .neg { color: #b46450; }
+
+  .grid2 { display: grid; grid-template-columns: 1.35fr 1fr; gap: 14px; margin-bottom: 14px; }
+  @media (max-width: 800px) { .grid2 { grid-template-columns: 1fr; } .strip { grid-template-columns: repeat(3, 1fr); } }
+
+  .panel { background: #0e0e0e; border: 1px solid #2a2a2a; margin-bottom: 14px; }
+  .panel-h {
+    font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 8px 12px; border-bottom: 1px solid #2a2a2a; font-weight: 600;
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;
+  }
+  .panel-h .note { color: #777; font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .panel-b { padding: 10px 12px; }
+
+  .metric-btns { display: flex; gap: 4px; flex-wrap: wrap; }
+  .metric-btns button {
+    background: #1a1a1a; border: 1px solid #333; color: #888; font-size: 10px;
+    min-height: 36px; min-width: 54px; padding: 7px 10px; cursor: pointer; font-family: inherit;
+  }
+  .metric-btns button.active { border-color: #d4a017; color: #d4a017; background: #1a1608; }
+  .axis-btns { display: flex; gap: 4px; }
+  .axis-btns button {
+    background: #1a1a1a; border: 1px solid #333; color: #888; font-size: 10px;
+    min-height: 36px; min-width: 54px; padding: 7px 10px; cursor: pointer; font-family: inherit;
+  }
+  .axis-btns button.active { border-color: #d4a017; color: #d4a017; background: #1a1608; }
+
+  .hm-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .hm-table { border-collapse: collapse; width: max-content; min-width: 100%; font-size: 11px; }
+  .hm-table th, .hm-table td { padding: 4px 6px; text-align: right; border: 1px solid #1e1e1e; }
+  .hm-sticky {
+    position: sticky; left: 0; z-index: 2; background: #0e0e0e; text-align: left !important;
+    color: #999; min-width: 88px;
+  }
+  .m-label { display: flex; flex-direction: column; gap: 1px; line-height: 1.15; }
+  .m-strike { color: #d8d8d8; font-variant-numeric: tabular-nums; font-size: 11px; }
+  .m-pct { color: #666; font-size: 10px; font-variant-numeric: tabular-nums; }
+  body.axis-pct .m-strike { display: none; }
+  body.axis-pct .m-pct { color: #d8d8d8; font-size: 11px; }
+  body.axis-strike .m-pct { display: none; }
+  .hm-cell { min-width: 58px; font-size: 10px; }
+  .atm-row .hm-sticky, .atm-row td { box-shadow: inset 0 1px 0 #d4a01744, inset 0 -1px 0 #d4a01744; }
+  .opex-col { box-shadow: inset 2px 0 0 #d4a01755; }
+  thead .opex-col { color: #d4a017; }
+  .rx-spot-px { display: block; color: #d8d8d8; font-variant-numeric: tabular-nums; }
+  .rx-spot-pct { display: block; color: #666; font-size: 10px; margin-top: 2px; }
+  body.axis-pct .rx-spot-px { display: none; }
+  body.axis-pct .rx-spot-pct { color: #d8d8d8; font-size: 11px; }
+  body.axis-strike .rx-spot-pct { display: none; }
+
+  .rx-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .rx-table th, .rx-table td { border: 1px solid #222; padding: 8px; text-align: center; vertical-align: middle; }
+  .rx-cell.buy { background: #0a1218; }
+  .rx-cell.sell { background: #140e0c; }
+  .rx-cell.neutral { background: #111; }
+  .rx-val { font-size: 14px; font-weight: 600; }
+  .rx-cell.buy .rx-val { color: #5a8fb0; }
+  .rx-cell.sell .rx-val { color: #b46450; }
+  .rx-side { font-size: 10px; color: #666; margin-top: 2px; }
+  .rx-dom { font-size: 10px; color: #888; margin-top: 2px; }
+
+  .side-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .side-grid { grid-template-columns: 1fr; } }
+
+  .levels { position: relative; height: 200px; background: #0a0a0a; border: 1px solid #222; }
+  .lv-row { position: absolute; left: 0; right: 0; display: flex; align-items: center; gap: 8px; font-size: 10px; }
+  .lv-line { width: 55%; height: 1px; margin-left: 4%; }
+  .lv-line.lv-spot { height: 2px; background: #e8e8e8; }
+  .lv-line.lv-flip { background: #d4a017; }
+  .lv-line.lv-mixed { background: #8c7a52; }
+  .lv-line.lv-call { background: #b46450; }
+  .lv-line.lv-put { background: #5a8fb0; }
+  .lv-line.lv-magnet { background: repeating-linear-gradient(90deg, #d4a017 0 4px, transparent 4px 9px); height: 2px; }
+  .lv-desc .zd-tag { color: #d4a017; }
+  .lv-lbl { color: #ccc; font-weight: 600; }
+  .lv-desc { color: #666; }
+
+  .clock-row {
+    display: grid; grid-template-columns: 72px 32px 1fr 52px; gap: 6px; align-items: center;
+    font-size: 11px; padding: 3px 0; border-bottom: 1px solid #1a1a1a;
+  }
+  .clock-bar { height: 4px; background: #1a1a1a; }
+  .clock-bar span { display: block; height: 100%; }
+  .clock-val { text-align: right; }
+
+  .synthesis { font-size: 12px; color: #b0b0b0; line-height: 1.55; }
+  .synthesis .tag { font-size: 10px; color: #d4a017; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .synthesis .ko { margin-top: 8px; color: #888; font-size: 11px; }
+
+  details.evidence { border: 1px solid #2a2a2a; background: #0e0e0e; margin-bottom: 14px; }
+  details.evidence summary {
+    padding: 8px 12px; cursor: pointer; font-size: 10px; color: #888;
+    text-transform: uppercase; letter-spacing: 0.06em; list-style: none;
+  }
+  details.evidence summary::-webkit-details-marker { display: none; }
+  details.evidence .ev-body { padding: 0 12px 12px; font-size: 12px; }
+  details.evidence ul { margin: 8px 0 0 16px; }
+  details.evidence li { margin-bottom: 6px; }
+  details.evidence a { color: #5a8fb0; text-decoration: none; }
+  details.evidence a:hover { color: #7ab0cc; }
+
+  details.raw-data { border: 1px solid #2a2a2a; background: #0c0c0c; margin-bottom: 14px; }
+  details.raw-data > summary { cursor: pointer; min-height: 46px; padding: 12px; color: #9a9a9a; font-size: 11px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; list-style: none; display: flex; align-items: center; justify-content: space-between; }
+  details.raw-data > summary::-webkit-details-marker { display: none; }
+  details.raw-data > summary::after { content: '펼치기'; color: #d4a017; font-size: 10px; letter-spacing: 0; }
+  details.raw-data[open] > summary::after { content: '접기'; }
+  .raw-inner { padding: 0 12px 12px; }
+  .raw-inner .strip { margin-bottom: 12px; }
+  .raw-inner .panel { margin-bottom: 0; }
+
+  details.lens { border: 1px solid #2a2a2a; background: #0e0e0e; margin-bottom: 14px; }
+  details.lens summary { min-height: 44px; padding: 11px 12px; cursor: pointer; list-style: none; color: #d4a017; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+  details.lens summary::-webkit-details-marker { display: none; }
+  details.lens .synthesis { padding: 0 12px 12px; }
+
+  footer { font-size: 10px; color: #555; border-top: 1px solid #222; padding-top: 10px; margin-top: 8px; }
+
+  @media (max-width: 800px) {
+    body { padding: 10px; font-size: 14px; }
+    header { display: block; padding-bottom: 12px; margin-bottom: 12px; }
+    header h1 { font-size: 15px; }
+    header .meta { margin-top: 5px; font-size: 10px; }
+    .decision-board { grid-template-columns: 1fr; gap: 10px; margin-bottom: 12px; }
+    .answers { grid-template-columns: 1fr; }
+    .answer { min-height: 0; padding: 12px 14px; }
+    .answer strong { font-size: 18px; }
+    .answer p { font-size: 12px; margin-top: 5px; }
+    .change-card { padding: 12px 14px; }
+    .change-card li { padding-top: 7px; padding-bottom: 7px; }
+    .confidence { margin-top: 8px; }
+    .panel { margin-bottom: 12px; }
+    .panel-h { min-height: 46px; padding: 8px 10px; }
+    .panel-b { padding: 10px; }
+    .metric-btns button { min-height: 44px; min-width: 62px; font-size: 11px; }
+    .axis-btns button { min-height: 44px; min-width: 62px; font-size: 11px; }
+    .hm-table { min-width: 620px; font-size: 11px; }
+    .hm-sticky { min-width: 96px; }
+    .hm-table th, .hm-table td { padding: 6px 8px; }
+    .hm-cell { min-width: 70px; font-size: 11px; }
+    .rx-table th, .rx-table td { padding: 10px 4px; }
+    .rx-val { font-size: 15px; }
+    .raw-inner { padding: 0 8px 8px; }
+    .synthesis .en { color: #666; font-size: 10px; margin-top: 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>DEALER POSITIONING <span class="muted">SPX · v2 reaction map</span></h1>
+  <div class="meta">2026-08-14 07:00:32 · CBOE delayed · OPEX 2026-08-21 T+7</div>
+</header>
+
+<section class="decision-board" aria-label="현재 판단">
+  <div class="answers">
+    <article class="answer now stabilize">
+      <span class="eyebrow">지금 · Now</span>
+      <strong>변동 완충 구간</strong>
+      <p class="mono">순감마 +1.78B · SPX 7,799</p>
+    </article>
+    <article class="answer">
+      <span class="eyebrow">대응 · Action</span>
+      <strong>급한 움직임은 되돌림을 확인한다</strong>
+      <p>헤지가 가격을 현 수준으로 되미는 구조가 우세하다.</p>
+    </article>
+    <article class="answer">
+      <span class="eyebrow">반전 · Break</span>
+      <strong>SPX 7,680</strong>
+      <p>이 가격을 통과하면 감마 체제가 뒤집힐 수 있다.</p>
+    </article>
+    <article class="answer">
+      <span class="eyebrow">시간 · Clock</span>
+      <strong>만기까지 7일</strong>
+      <p>만기 효과가 이미 가까운 구간이다.</p>
+    </article>
+  </div>
+  <aside class="change-card">
+    <h2>오늘 달라진 점 · What changed</h2>
+    <ol><li>순감마가 0.96B 줄었다.</li></ol>
+    <p class="confidence"><b>신뢰도 보통</b>지연 자료 · 전일 미결제약정 · 모형 추정</p>
+  </aside>
+</section>
+
+<div class="panel hero-map">
+  <div class="panel-h">반응 지도 · Reaction map <span class="note">관측 흐름이 아닌 모형 추정</span></div>
+  <div class="panel-b">
+    
+    <table class="rx-table">
+      <thead><tr><th class="hm-sticky"></th><th><span class="rx-spot-px">7,643</span><span class="rx-spot-pct">Spot -2%</span></th><th><span class="rx-spot-px">7,799</span><span class="rx-spot-pct">Spot +0%</span></th><th><span class="rx-spot-px">7,955</span><span class="rx-spot-pct">Spot +2%</span></th></tr></thead>
+      <tbody><tr><th class="hm-sticky">변동성 +5pt</th><td class="rx-cell buy"><div class="rx-val mono">+47.27B</div><div class="rx-side">매수 추정</div><div class="rx-dom">주요축: 감마</div></td><td class="rx-cell sell"><div class="rx-val mono">-230.70B</div><div class="rx-side">매도 추정</div><div class="rx-dom">주요축: 반나</div></td><td class="rx-cell sell"><div class="rx-val mono">-508.68B</div><div class="rx-side">매도 추정</div><div class="rx-dom">주요축: 감마</div></td></tr><tr><th class="hm-sticky">변동성 +0pt</th><td class="rx-cell buy"><div class="rx-val mono">+277.97B</div><div class="rx-side">매수 추정</div><div class="rx-dom">주요축: 감마</div></td><td class="rx-cell neutral"><div class="rx-val mono">0.00B</div><div class="rx-side">중립</div><div class="rx-dom">주요축: 중립</div></td><td class="rx-cell sell"><div class="rx-val mono">-277.97B</div><div class="rx-side">매도 추정</div><div class="rx-dom">주요축: 감마</div></td></tr><tr><th class="hm-sticky">변동성 -5pt</th><td class="rx-cell buy"><div class="rx-val mono">+508.68B</div><div class="rx-side">매수 추정</div><div class="rx-dom">주요축: 감마</div></td><td class="rx-cell buy"><div class="rx-val mono">+230.70B</div><div class="rx-side">매수 추정</div><div class="rx-dom">주요축: 반나</div></td><td class="rx-cell sell"><div class="rx-val mono">-47.27B</div><div class="rx-side">매도 추정</div><div class="rx-dom">주요축: 감마</div></td></tr></tbody>
+    </table>
+    <p class="muted" style="margin-top:8px">Estimated dealer hedge demand (model proxy, not observed flow)</p>
+  </div>
+</div>
+
+<details class="raw-data" open>
+  <summary>원자료와 노출 표면 · Raw data</summary>
+  <div class="raw-inner">
+    <div class="strip">
+      <div class="c"><div class="k">SPX</div><div class="v mono">7,799</div></div>
+      <div class="c"><div class="k">Net GEX</div><div class="v mono pos">+1.78B</div></div>
+      <div class="c"><div class="k">Net dGEX</div><div class="v mono pos">+1.40B</div></div>
+      <div class="c"><div class="k">Vega balance</div><div class="v mono pos">+2.08B</div></div>
+      <div class="c"><div class="k">Net Vanna</div><div class="v mono pos">+46.14B</div></div>
+      <div class="c"><div class="k">Prior day</div><div class="v mono">GEX -0.96B · SPX +0 pts</div></div>
+    </div>
+    <div class="panel">
+    <div class="panel-h">
+      <span>노출 표면 · Exposure surface</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <div class="axis-btns" role="group" aria-label="Axis unit">
+          <button type="button" class="active" data-axis="strike">가격</button>
+          <button type="button" data-axis="pct">%</button>
+        </div>
+        <div class="metric-btns">
+          <button type="button" class="active" data-metric="gex">GEX</button>
+          <button type="button" data-metric="dgex">dGEX</button>
+          <button type="button" data-metric="vanna">Vanna</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel-b hm-scroll">
+      <table class="hm-table" id="heatmap">
+        <thead><tr><th class="hm-sticky" id="hm-y-label">행사가</th><th class="opex-col">0–7d</th><th class="">8–30d</th><th class="">31–90d</th><th class="">91–180d</th><th class="">180d+</th></tr></thead>
+        <tbody id="hm-body">
+          <tr class=""><th class="hm-sticky" title="above 8,189 (&gt;+5%)"><span class="m-label" data-strike="&gt;8,189" data-pct="&gt;+5%"><span class="m-strike">&gt;8,189</span><span class="m-pct">&gt;+5%</span></span></th><td class="hm-cell opex-col" data-m="&gt;+5%" data-d="0-7d" data-gex="0.0056" data-dgex="0.0000" data-vanna="0.1396" data-active="70" style="background:rgba(90,143,176,0.16);color:#d8d8d8" title="above 8,189 (&gt;+5%) / 0-7d · GEX: +0.01B · GEX +0.01B · dGEX 0.00B · Vanna +0.14B · active 70">+0.01B</td><td class="hm-cell" data-m="&gt;+5%" data-d="8-30d" data-gex="0.0075" data-dgex="0.0002" data-vanna="0.2643" data-active="156" style="background:rgba(90,143,176,0.16);color:#d8d8d8" title="above 8,189 (&gt;+5%) / 8-30d · GEX: +0.01B · GEX +0.01B · dGEX 0.00B · Vanna +0.26B · active 156">+0.01B</td><td class="hm-cell" data-m="&gt;+5%" data-d="31-90d" data-gex="0.0966" data-dgex="0.0069" data-vanna="3.7781" data-active="368" style="background:rgba(90,143,176,0.24);color:#d8d8d8" title="above 8,189 (&gt;+5%) / 31-90d · GEX: +0.10B · GEX +0.10B · dGEX +0.01B · Vanna +3.78B · active 368">+0.10B</td><td class="hm-cell" data-m="&gt;+5%" data-d="91-180d" data-gex="0.1307" data-dgex="0.0295" data-vanna="5.1765" data-active="320" style="background:rgba(90,143,176,0.28);color:#d8d8d8" title="above 8,189 (&gt;+5%) / 91-180d · GEX: +0.13B · GEX +0.13B · dGEX +0.03B · Vanna +5.18B · active 320">+0.13B</td><td class="hm-cell" data-m="&gt;+5%" data-d="180d+" data-gex="0.1012" data-dgex="0.0293" data-vanna="5.1508" data-active="973" style="background:rgba(90,143,176,0.25);color:#d8d8d8" title="above 8,189 (&gt;+5%) / 180d+ · GEX: +0.10B · GEX +0.10B · dGEX +0.03B · Vanna +5.15B · active 973">+0.10B</td></tr><tr class=""><th class="hm-sticky" title="8,189–8,267 (+5% vs spot 7,799)"><span class="m-label" data-strike="8,189–8,267" data-pct="+5%"><span class="m-strike">8,189–8,267</span><span class="m-pct">+5%</span></span></th><td class="hm-cell opex-col" data-m="+5%" data-d="0-7d" data-gex="0.0000" data-dgex="0.0000" data-vanna="0.0000" data-active="0" style="background:#1a1a1a;color:#888" title="8,189–8,267 (+5% vs spot 7,799) / 0-7d · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna 0.00B · active 0">0.00B</td><td class="hm-cell" data-m="+5%" data-d="8-30d" data-gex="0.0000" data-dgex="0.0000" data-vanna="0.0000" data-active="0" style="background:#1a1a1a;color:#888" title="8,189–8,267 (+5% vs spot 7,799) / 8-30d · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna 0.00B · active 0">0.00B</td><td class="hm-cell" data-m="+5%" data-d="31-90d" data-gex="0.0000" data-dgex="0.0000" data-vanna="0.0000" data-active="0" style="background:#1a1a1a;color:#888" title="8,189–8,267 (+5% vs spot 7,799) / 31-90d · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna 0.00B · active 0">0.00B</td><td class="hm-cell" data-m="+5%" data-d="91-180d" data-gex="0.0000" data-dgex="0.0000" data-vanna="0.0000" data-active="0" style="background:#1a1a1a;color:#888" title="8,189–8,267 (+5% vs spot 7,799) / 91-180d · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna 0.00B · active 0">0.00B</td><td class="hm-cell" data-m="+5%" data-d="180d+" data-gex="0.0000" data-dgex="0.0000" data-vanna="0.0000" data-active="0" style="background:#1a1a1a;color:#888" title="8,189–8,267 (+5% vs spot 7,799) / 180d+ · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna 0.00B · active 0">0.00B</td></tr><tr class=""><th class="hm-sticky" title="8,111–8,189 (+4% vs spot 7,799)"><span class="m-label" data-strike="8,111–8,189" data-pct="+4%"><span class="m-strike">8,111–8,189</span><span class="m-pct">+4%</span></span></th><td class="hm-cell opex-col" data-m="+4%" data-d="0-7d" data-gex="0.0038" data-dgex="0.0000" data-vanna="0.0847" data-active="43" style="background:rgba(90,143,176,0.15);color:#d8d8d8" title="8,111–8,189 (+4% vs spot 7,799) / 0-7d · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna +0.08B · active 43">0.00B</td><td class="hm-cell" data-m="+4%" data-d="8-30d" data-gex="0.0027" data-dgex="0.0001" data-vanna="0.0756" data-active="63" style="background:rgba(90,143,176,0.15);color:#d8d8d8" title="8,111–8,189 (+4% vs spot 7,799) / 8-30d · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna +0.08B · active 63">0.00B</td><td class="hm-cell" data-m="+4%" data-d="31-90d" data-gex="0.0221" data-dgex="0.0036" data-vanna="0.5992" data-active="90" style="background:rgba(90,143,176,0.17);color:#d8d8d8" title="8,111–8,189 (+4% vs spot 7,799) / 31-90d · GEX: +0.02B · GEX +0.02B · dGEX 0.00B · Vanna +0.60B · active 90">+0.02B</td><td class="hm-cell" data-m="+4%" data-d="91-180d" data-gex="0.1204" data-dgex="0.0452" data-vanna="2.4176" data-active="78" style="background:rgba(90,143,176,0.27);color:#d8d8d8" title="8,111–8,189 (+4% vs spot 7,799) / 91-180d · GEX: +0.12B · GEX +0.12B · dGEX +0.05B · Vanna +2.42B · active 78">+0.12B</td><td class="hm-cell" data-m="+4%" data-d="180d+" data-gex="0.0072" data-dgex="0.0033" data-vanna="0.1305" data-active="75" style="background:rgba(90,143,176,0.16);color:#d8d8d8" title="8,111–8,189 (+4% vs spot 7,799) / 180d+ · GEX: +0.01B · GEX +0.01B · dGEX 0.00B · Vanna +0.13B · active 75">+0.01B</td></tr><tr class=""><th class="hm-sticky" title="8,033–8,111 (+3% vs spot 7,799)"><span class="m-label" data-strike="8,033–8,111" data-pct="+3%"><span class="m-strike">8,033–8,111</span><span class="m-pct">+3%</span></span></th><td class="hm-cell opex-col" data-m="+3%" data-d="0-7d" data-gex="0.0141" data-dgex="0.0001" data-vanna="0.2707" data-active="66" style="background:rgba(90,143,176,0.16);color:#d8d8d8" title="8,033–8,111 (+3% vs spot 7,799) / 0-7d · GEX: +0.01B · GEX +0.01B · dGEX 0.00B · Vanna +0.27B · active 66">+0.01B</td><td class="hm-cell" data-m="+3%" data-d="8-30d" data-gex="0.0199" data-dgex="0.0014" data-vanna="0.4546" data-active="75" style="background:rgba(90,143,176,0.17);color:#d8d8d8" title="8,033–8,111 (+3% vs spot 7,799) / 8-30d · GEX: +0.02B · GEX +0.02B · dGEX 0.00B · Vanna +0.45B · active 75">+0.02B</td><td class="hm-cell" data-m="+3%" data-d="31-90d" data-gex="0.0483" data-dgex="0.0107" data-vanna="1.0417" data-active="133" style="background:rgba(90,143,176,0.20);color:#d8d8d8" title="8,033–8,111 (+3% vs spot 7,799) / 31-90d · GEX: +0.05B · GEX +0.05B · dGEX +0.01B · Vanna +1.04B · active 133">+0.05B</td><td class="hm-cell" data-m="+3%" data-d="91-180d" data-gex="0.1124" data-dgex="0.0469" data-vanna="1.6760" data-active="104" style="background:rgba(90,143,176,0.26);color:#d8d8d8" title="8,033–8,111 (+3% vs spot 7,799) / 91-180d · GEX: +0.11B · GEX +0.11B · dGEX +0.05B · Vanna +1.68B · active 104">+0.11B</td><td class="hm-cell" data-m="+3%" data-d="180d+" data-gex="0.0130" data-dgex="0.0064" data-vanna="0.1801" data-active="95" style="background:rgba(90,143,176,0.16);color:#d8d8d8" title="8,033–8,111 (+3% vs spot 7,799) / 180d+ · GEX: +0.01B · GEX +0.01B · dGEX +0.01B · Vanna +0.18B · active 95">+0.01B</td></tr><tr class=""><th class="hm-sticky" title="7,955–8,033 (+2% vs spot 7,799)"><span class="m-label" data-strike="7,955–8,033" data-pct="+2%"><span class="m-strike">7,955–8,033</span><span class="m-pct">+2%</span></span></th><td class="hm-cell opex-col" data-m="+2%" data-d="0-7d" data-gex="0.0338" data-dgex="-0.0764" data-vanna="0.6035" data-active="116" style="background:rgba(90,143,176,0.18);color:#d8d8d8" title="7,955–8,033 (+2% vs spot 7,799) / 0-7d · GEX: +0.03B · GEX +0.03B · dGEX -0.08B · Vanna +0.60B · active 116">+0.03B</td><td class="hm-cell" data-m="+2%" data-d="8-30d" data-gex="0.0388" data-dgex="0.0004" data-vanna="0.6771" data-active="107" style="background:rgba(90,143,176,0.19);color:#d8d8d8" title="7,955–8,033 (+2% vs spot 7,799) / 8-30d · GEX: +0.04B · GEX +0.04B · dGEX 0.00B · Vanna +0.68B · active 107">+0.04B</td><td class="hm-cell" data-m="+2%" data-d="31-90d" data-gex="0.0574" data-dgex="-0.1047" data-vanna="0.8375" data-active="185" style="background:rgba(90,143,176,0.21);color:#d8d8d8" title="7,955–8,033 (+2% vs spot 7,799) / 31-90d · GEX: +0.06B · GEX +0.06B · dGEX -0.10B · Vanna +0.84B · active 185">+0.06B</td><td class="hm-cell" data-m="+2%" data-d="91-180d" data-gex="0.0461" data-dgex="0.0146" data-vanna="0.4856" data-active="122" style="background:rgba(90,143,176,0.19);color:#d8d8d8" title="7,955–8,033 (+2% vs spot 7,799) / 91-180d · GEX: +0.05B · GEX +0.05B · dGEX +0.01B · Vanna +0.49B · active 122">+0.05B</td><td class="hm-cell" data-m="+2%" data-d="180d+" data-gex="0.0071" data-dgex="0.0083" data-vanna="0.0270" data-active="97" style="background:rgba(90,143,176,0.16);color:#d8d8d8" title="7,955–8,033 (+2% vs spot 7,799) / 180d+ · GEX: +0.01B · GEX +0.01B · dGEX +0.01B · Vanna +0.03B · active 97">+0.01B</td></tr><tr class=""><th class="hm-sticky" title="7,877–7,955 (+1% vs spot 7,799)"><span class="m-label" data-strike="7,877–7,955" data-pct="+1%"><span class="m-strike">7,877–7,955</span><span class="m-pct">+1%</span></span></th><td class="hm-cell opex-col" data-m="+1%" data-d="0-7d" data-gex="0.2055" data-dgex="0.0210" data-vanna="2.0050" data-active="172" style="background:rgba(90,143,176,0.35);color:#d8d8d8" title="7,877–7,955 (+1% vs spot 7,799) / 0-7d · GEX: +0.21B · GEX +0.21B · dGEX +0.02B · Vanna +2.00B · active 172">+0.21B</td><td class="hm-cell" data-m="+1%" data-d="8-30d" data-gex="0.1001" data-dgex="0.0294" data-vanna="1.0115" data-active="171" style="background:rgba(90,143,176,0.25);color:#d8d8d8" title="7,877–7,955 (+1% vs spot 7,799) / 8-30d · GEX: +0.10B · GEX +0.10B · dGEX +0.03B · Vanna +1.01B · active 171">+0.10B</td><td class="hm-cell" data-m="+1%" data-d="31-90d" data-gex="0.0852" data-dgex="0.0345" data-vanna="0.6677" data-active="211" style="background:rgba(90,143,176,0.23);color:#d8d8d8" title="7,877–7,955 (+1% vs spot 7,799) / 31-90d · GEX: +0.09B · GEX +0.09B · dGEX +0.03B · Vanna +0.67B · active 211">+0.09B</td><td class="hm-cell" data-m="+1%" data-d="91-180d" data-gex="0.0173" data-dgex="0.0090" data-vanna="0.0842" data-active="115" style="background:rgba(90,143,176,0.17);color:#d8d8d8" title="7,877–7,955 (+1% vs spot 7,799) / 91-180d · GEX: +0.02B · GEX +0.02B · dGEX +0.01B · Vanna +0.08B · active 115">+0.02B</td><td class="hm-cell" data-m="+1%" data-d="180d+" data-gex="0.0034" data-dgex="0.0024" data-vanna="0.0107" data-active="100" style="background:rgba(90,143,176,0.15);color:#d8d8d8" title="7,877–7,955 (+1% vs spot 7,799) / 180d+ · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna +0.01B · active 100">0.00B</td></tr><tr class="atm-row"><th class="hm-sticky atm-row" title="7,799–7,877 (0% vs spot 7,799)"><span class="m-label" data-strike="7,799–7,877" data-pct="0%"><span class="m-strike">7,799–7,877</span><span class="m-pct">0%</span></span></th><td class="hm-cell opex-col atm-row" data-m="0%" data-d="0-7d" data-gex="0.7746" data-dgex="0.4437" data-vanna="1.5049" data-active="431" style="background:rgba(90,143,176,0.90);color:#d8d8d8" title="7,799–7,877 (0% vs spot 7,799) / 0-7d · GEX: +0.77B · GEX +0.77B · dGEX +0.44B · Vanna +1.50B · active 431">+0.77B</td><td class="hm-cell atm-row" data-m="0%" data-d="8-30d" data-gex="0.0776" data-dgex="0.0508" data-vanna="0.1862" data-active="677" style="background:rgba(90,143,176,0.23);color:#d8d8d8" title="7,799–7,877 (0% vs spot 7,799) / 8-30d · GEX: +0.08B · GEX +0.08B · dGEX +0.05B · Vanna +0.19B · active 677">+0.08B</td><td class="hm-cell atm-row" data-m="0%" data-d="31-90d" data-gex="0.0993" data-dgex="0.0747" data-vanna="-0.0388" data-active="531" style="background:rgba(90,143,176,0.25);color:#d8d8d8" title="7,799–7,877 (0% vs spot 7,799) / 31-90d · GEX: +0.10B · GEX +0.10B · dGEX +0.07B · Vanna -0.04B · active 531">+0.10B</td><td class="hm-cell atm-row" data-m="0%" data-d="91-180d" data-gex="0.0208" data-dgex="0.0143" data-vanna="-0.0539" data-active="280" style="background:rgba(90,143,176,0.17);color:#d8d8d8" title="7,799–7,877 (0% vs spot 7,799) / 91-180d · GEX: +0.02B · GEX +0.02B · dGEX +0.01B · Vanna -0.05B · active 280">+0.02B</td><td class="hm-cell atm-row" data-m="0%" data-d="180d+" data-gex="0.0012" data-dgex="0.0039" data-vanna="-0.0065" data-active="221" style="background:rgba(90,143,176,0.15);color:#d8d8d8" title="7,799–7,877 (0% vs spot 7,799) / 180d+ · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna -0.01B · active 221">0.00B</td></tr><tr class=""><th class="hm-sticky" title="7,643–7,721 (-1% vs spot 7,799)"><span class="m-label" data-strike="7,643–7,721" data-pct="-1%"><span class="m-strike">7,643–7,721</span><span class="m-pct">-1%</span></span></th><td class="hm-cell opex-col" data-m="-1%" data-d="0-7d" data-gex="-0.0381" data-dgex="0.0572" data-vanna="0.4404" data-active="224" style="background:rgba(180,100,80,0.19);color:#d8d8d8" title="7,643–7,721 (-1% vs spot 7,799) / 0-7d · GEX: -0.04B · GEX -0.04B · dGEX +0.06B · Vanna +0.44B · active 224">-0.04B</td><td class="hm-cell" data-m="-1%" data-d="8-30d" data-gex="0.0037" data-dgex="0.0253" data-vanna="-0.0369" data-active="358" style="background:rgba(90,143,176,0.15);color:#d8d8d8" title="7,643–7,721 (-1% vs spot 7,799) / 8-30d · GEX: 0.00B · GEX 0.00B · dGEX +0.03B · Vanna -0.04B · active 358">0.00B</td><td class="hm-cell" data-m="-1%" data-d="31-90d" data-gex="0.0094" data-dgex="0.0328" data-vanna="-0.1169" data-active="268" style="background:rgba(90,143,176,0.16);color:#d8d8d8" title="7,643–7,721 (-1% vs spot 7,799) / 31-90d · GEX: +0.01B · GEX +0.01B · dGEX +0.03B · Vanna -0.12B · active 268">+0.01B</td><td class="hm-cell" data-m="-1%" data-d="91-180d" data-gex="0.0074" data-dgex="0.0082" data-vanna="-0.0689" data-active="135" style="background:rgba(90,143,176,0.16);color:#d8d8d8" title="7,643–7,721 (-1% vs spot 7,799) / 91-180d · GEX: +0.01B · GEX +0.01B · dGEX +0.01B · Vanna -0.07B · active 135">+0.01B</td><td class="hm-cell" data-m="-1%" data-d="180d+" data-gex="0.0007" data-dgex="0.0024" data-vanna="-0.0061" data-active="101" style="background:rgba(90,143,176,0.15);color:#d8d8d8" title="7,643–7,721 (-1% vs spot 7,799) / 180d+ · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna -0.01B · active 101">0.00B</td></tr><tr class=""><th class="hm-sticky" title="7,565–7,643 (-2% vs spot 7,799)"><span class="m-label" data-strike="7,565–7,643" data-pct="-2%"><span class="m-strike">7,565–7,643</span><span class="m-pct">-2%</span></span></th><td class="hm-cell opex-col" data-m="-2%" data-d="0-7d" data-gex="-0.0205" data-dgex="0.0345" data-vanna="0.3174" data-active="209" style="background:rgba(180,100,80,0.17);color:#d8d8d8" title="7,565–7,643 (-2% vs spot 7,799) / 0-7d · GEX: -0.02B · GEX -0.02B · dGEX +0.03B · Vanna +0.32B · active 209">-0.02B</td><td class="hm-cell" data-m="-2%" data-d="8-30d" data-gex="-0.0061" data-dgex="0.0225" data-vanna="0.1162" data-active="334" style="background:rgba(180,100,80,0.16);color:#d8d8d8" title="7,565–7,643 (-2% vs spot 7,799) / 8-30d · GEX: -0.01B · GEX -0.01B · dGEX +0.02B · Vanna +0.12B · active 334">-0.01B</td><td class="hm-cell" data-m="-2%" data-d="31-90d" data-gex="0.0011" data-dgex="0.0633" data-vanna="-0.0096" data-active="242" style="background:rgba(90,143,176,0.15);color:#d8d8d8" title="7,565–7,643 (-2% vs spot 7,799) / 31-90d · GEX: 0.00B · GEX 0.00B · dGEX +0.06B · Vanna -0.01B · active 242">0.00B</td><td class="hm-cell" data-m="-2%" data-d="91-180d" data-gex="0.0025" data-dgex="0.0069" data-vanna="-0.0335" data-active="138" style="background:rgba(90,143,176,0.15);color:#d8d8d8" title="7,565–7,643 (-2% vs spot 7,799) / 91-180d · GEX: 0.00B · GEX 0.00B · dGEX +0.01B · Vanna -0.03B · active 138">0.00B</td><td class="hm-cell" data-m="-2%" data-d="180d+" data-gex="-0.0010" data-dgex="0.0026" data-vanna="0.0030" data-active="104" style="background:rgba(180,100,80,0.15);color:#d8d8d8" title="7,565–7,643 (-2% vs spot 7,799) / 180d+ · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna 0.00B · active 104">0.00B</td></tr><tr class=""><th class="hm-sticky" title="7,487–7,565 (-3% vs spot 7,799)"><span class="m-label" data-strike="7,487–7,565" data-pct="-3%"><span class="m-strike">7,487–7,565</span><span class="m-pct">-3%</span></span></th><td class="hm-cell opex-col" data-m="-3%" data-d="0-7d" data-gex="-0.0244" data-dgex="0.0293" data-vanna="0.4265" data-active="213" style="background:rgba(180,100,80,0.17);color:#d8d8d8" title="7,487–7,565 (-3% vs spot 7,799) / 0-7d · GEX: -0.02B · GEX -0.02B · dGEX +0.03B · Vanna +0.43B · active 213">-0.02B</td><td class="hm-cell" data-m="-3%" data-d="8-30d" data-gex="-0.0224" data-dgex="0.0071" data-vanna="0.4554" data-active="279" style="background:rgba(180,100,80,0.17);color:#d8d8d8" title="7,487–7,565 (-3% vs spot 7,799) / 8-30d · GEX: -0.02B · GEX -0.02B · dGEX +0.01B · Vanna +0.46B · active 279">-0.02B</td><td class="hm-cell" data-m="-3%" data-d="31-90d" data-gex="-0.0314" data-dgex="0.0687" data-vanna="0.6613" data-active="228" style="background:rgba(180,100,80,0.18);color:#d8d8d8" title="7,487–7,565 (-3% vs spot 7,799) / 31-90d · GEX: -0.03B · GEX -0.03B · dGEX +0.07B · Vanna +0.66B · active 228">-0.03B</td><td class="hm-cell" data-m="-3%" data-d="91-180d" data-gex="-0.0054" data-dgex="0.0071" data-vanna="0.1039" data-active="140" style="background:rgba(180,100,80,0.16);color:#d8d8d8" title="7,487–7,565 (-3% vs spot 7,799) / 91-180d · GEX: -0.01B · GEX -0.01B · dGEX +0.01B · Vanna +0.10B · active 140">-0.01B</td><td class="hm-cell" data-m="-3%" data-d="180d+" data-gex="0.0043" data-dgex="0.0073" data-vanna="-0.0825" data-active="123" style="background:rgba(90,143,176,0.15);color:#d8d8d8" title="7,487–7,565 (-3% vs spot 7,799) / 180d+ · GEX: 0.00B · GEX 0.00B · dGEX +0.01B · Vanna -0.08B · active 123">0.00B</td></tr><tr class=""><th class="hm-sticky" title="7,409–7,487 (-4% vs spot 7,799)"><span class="m-label" data-strike="7,409–7,487" data-pct="-4%"><span class="m-strike">7,409–7,487</span><span class="m-pct">-4%</span></span></th><td class="hm-cell opex-col" data-m="-4%" data-d="0-7d" data-gex="-0.0047" data-dgex="0.0072" data-vanna="0.0944" data-active="191" style="background:rgba(180,100,80,0.15);color:#d8d8d8" title="7,409–7,487 (-4% vs spot 7,799) / 0-7d · GEX: 0.00B · GEX 0.00B · dGEX +0.01B · Vanna +0.09B · active 191">0.00B</td><td class="hm-cell" data-m="-4%" data-d="8-30d" data-gex="-0.0084" data-dgex="0.0034" data-vanna="0.2010" data-active="272" style="background:rgba(180,100,80,0.16);color:#d8d8d8" title="7,409–7,487 (-4% vs spot 7,799) / 8-30d · GEX: -0.01B · GEX -0.01B · dGEX 0.00B · Vanna +0.20B · active 272">-0.01B</td><td class="hm-cell" data-m="-4%" data-d="31-90d" data-gex="-0.0109" data-dgex="0.0445" data-vanna="0.2641" data-active="224" style="background:rgba(180,100,80,0.16);color:#d8d8d8" title="7,409–7,487 (-4% vs spot 7,799) / 31-90d · GEX: -0.01B · GEX -0.01B · dGEX +0.04B · Vanna +0.26B · active 224">-0.01B</td><td class="hm-cell" data-m="-4%" data-d="91-180d" data-gex="-0.0022" data-dgex="0.0043" data-vanna="0.0495" data-active="144" style="background:rgba(180,100,80,0.15);color:#d8d8d8" title="7,409–7,487 (-4% vs spot 7,799) / 91-180d · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna +0.05B · active 144">0.00B</td><td class="hm-cell" data-m="-4%" data-d="180d+" data-gex="0.0014" data-dgex="0.0031" data-vanna="-0.0339" data-active="116" style="background:rgba(90,143,176,0.15);color:#d8d8d8" title="7,409–7,487 (-4% vs spot 7,799) / 180d+ · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna -0.03B · active 116">0.00B</td></tr><tr class=""><th class="hm-sticky" title="7,331–7,409 (-5% vs spot 7,799)"><span class="m-label" data-strike="7,331–7,409" data-pct="-5%"><span class="m-strike">7,331–7,409</span><span class="m-pct">-5%</span></span></th><td class="hm-cell opex-col" data-m="-5%" data-d="0-7d" data-gex="0.0000" data-dgex="0.0000" data-vanna="0.0000" data-active="0" style="background:#1a1a1a;color:#888" title="7,331–7,409 (-5% vs spot 7,799) / 0-7d · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna 0.00B · active 0">0.00B</td><td class="hm-cell" data-m="-5%" data-d="8-30d" data-gex="0.0000" data-dgex="0.0000" data-vanna="0.0000" data-active="0" style="background:#1a1a1a;color:#888" title="7,331–7,409 (-5% vs spot 7,799) / 8-30d · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna 0.00B · active 0">0.00B</td><td class="hm-cell" data-m="-5%" data-d="31-90d" data-gex="0.0000" data-dgex="0.0000" data-vanna="0.0000" data-active="0" style="background:#1a1a1a;color:#888" title="7,331–7,409 (-5% vs spot 7,799) / 31-90d · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna 0.00B · active 0">0.00B</td><td class="hm-cell" data-m="-5%" data-d="91-180d" data-gex="0.0000" data-dgex="0.0000" data-vanna="0.0000" data-active="0" style="background:#1a1a1a;color:#888" title="7,331–7,409 (-5% vs spot 7,799) / 91-180d · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna 0.00B · active 0">0.00B</td><td class="hm-cell" data-m="-5%" data-d="180d+" data-gex="0.0000" data-dgex="0.0000" data-vanna="0.0000" data-active="0" style="background:#1a1a1a;color:#888" title="7,331–7,409 (-5% vs spot 7,799) / 180d+ · GEX: 0.00B · GEX 0.00B · dGEX 0.00B · Vanna 0.00B · active 0">0.00B</td></tr><tr class=""><th class="hm-sticky" title="below 7,409 (&lt;-5%)"><span class="m-label" data-strike="&lt;7,409" data-pct="&lt;-5%"><span class="m-strike">&lt;7,409</span><span class="m-pct">&lt;-5%</span></span></th><td class="hm-cell opex-col" data-m="&lt;-5%" data-d="0-7d" data-gex="-0.0132" data-dgex="0.0051" data-vanna="0.2822" data-active="445" style="background:rgba(180,100,80,0.16);color:#d8d8d8" title="below 7,409 (&lt;-5%) / 0-7d · GEX: -0.01B · GEX -0.01B · dGEX +0.01B · Vanna +0.28B · active 445">-0.01B</td><td class="hm-cell" data-m="&lt;-5%" data-d="8-30d" data-gex="-0.0542" data-dgex="0.0030" data-vanna="1.6172" data-active="1083" style="background:rgba(180,100,80,0.20);color:#d8d8d8" title="below 7,409 (&lt;-5%) / 8-30d · GEX: -0.05B · GEX -0.05B · dGEX 0.00B · Vanna +1.62B · active 1083">-0.05B</td><td class="hm-cell" data-m="&lt;-5%" data-d="31-90d" data-gex="-0.1432" data-dgex="0.1093" data-vanna="5.2669" data-active="2093" style="background:rgba(180,100,80,0.29);color:#d8d8d8" title="below 7,409 (&lt;-5%) / 31-90d · GEX: -0.14B · GEX -0.14B · dGEX +0.11B · Vanna +5.27B · active 2093">-0.14B</td><td class="hm-cell" data-m="&lt;-5%" data-d="91-180d" data-gex="-0.0857" data-dgex="0.0796" data-vanna="4.0260" data-active="1567" style="background:rgba(180,100,80,0.23);color:#d8d8d8" title="below 7,409 (&lt;-5%) / 91-180d · GEX: -0.09B · GEX -0.09B · dGEX +0.08B · Vanna +4.03B · active 1567">-0.09B</td><td class="hm-cell" data-m="&lt;-5%" data-d="180d+" data-gex="-0.0501" data-dgex="0.0540" data-vanna="2.7618" data-active="2069" style="background:rgba(180,100,80,0.20);color:#d8d8d8" title="below 7,409 (&lt;-5%) / 180d+ · GEX: -0.05B · GEX -0.05B · dGEX +0.05B · Vanna +2.76B · active 2069">-0.05B</td></tr>
+        </tbody>
+      </table>
+      <p class="muted" style="margin-top:8px" id="hm-axis-note">Y = 실제 행사가 구간 (현물 대비) · X = 만기 구간 · amber row = ATM · amber column = OPEX</p>
+    </div>
+  </div>
+  </div>
+</details>
+
+<div class="side-grid">
+  <div class="panel">
+    <div class="panel-h">Key boundaries</div>
+    <div class="panel-b"><div class="levels"><div class="lv-row" style="top:4.6%"><div class="lv-line lv-mixed"></div><span class="lv-lbl mono">8,000</span><span class="lv-desc">call/put walls · near walls (+2.58%)</span></div><div class="lv-row" style="top:61.4%"><div class="lv-line lv-magnet"></div><span class="lv-lbl mono">7,800</span><span class="lv-desc">0DTE magnet 7,800 (+0.11B pin · net +0.42B GEX) (+0.01%)</span></div><div class="lv-row" style="top:61.7%"><div class="lv-line lv-spot"></div><span class="lv-lbl mono">7,799</span><span class="lv-desc">spot (0.00%)</span></div><div class="lv-row" style="top:95.6%"><div class="lv-line lv-flip"></div><span class="lv-lbl mono">7,680</span><span class="lv-desc">gamma flip (-1.53%)</span></div></div></div>
+  </div>
+  <div class="panel">
+    <div class="panel-h">Term clock <span class="note">nearest expiries · net GEX</span></div>
+    <div class="panel-b"><div class="clock-row"><span class="clock-exp">2026-08-14</span><span class="clock-dte mono">0d</span><span class="clock-bar"><span style="width:3%;background:#5a8fb0"></span></span><span class="clock-val mono">+0.42B</span></div><div class="clock-row"><span class="clock-exp">2026-08-17</span><span class="clock-dte mono">3d</span><span class="clock-bar"><span style="width:1%;background:#5a8fb0"></span></span><span class="clock-val mono">+0.11B</span></div><div class="clock-row"><span class="clock-exp">2026-08-18</span><span class="clock-dte mono">4d</span><span class="clock-bar"><span style="width:0%;background:#5a8fb0"></span></span><span class="clock-val mono">+0.03B</span></div><div class="clock-row"><span class="clock-exp">2026-08-19</span><span class="clock-dte mono">5d</span><span class="clock-bar"><span style="width:0%;background:#5a8fb0"></span></span><span class="clock-val mono">+0.04B</span></div><div class="clock-row"><span class="clock-exp">2026-08-20</span><span class="clock-dte mono">6d</span><span class="clock-bar"><span style="width:0%;background:#5a8fb0"></span></span><span class="clock-val mono">+0.01B</span></div><div class="clock-row"><span class="clock-exp">2026-08-21</span><span class="clock-dte mono">7d</span><span class="clock-bar"><span style="width:3%;background:#5a8fb0"></span></span><span class="clock-val mono">+0.33B</span></div></div>
+  </div>
+</div>
+
+<details class="lens">
+  <summary>Cem식 해석의 틀 · 합성 설명, 직접 인용 아님</summary>
+  <div class="synthesis">
+    <p class="ko">딜러 포지션은 벽이 아니라 지형 위의 날씨다. 가격이 지형, 만기가 고도, 변동성이 기압, 감마/반나가 바람이다. 하나의 행사가를 저항으로 표시하는 것은 대기가 움직이기 전까지만 유용하다.</p>
+    <p class="en">A dealer book is not a wall. It is weather over terrain. Price is the terrain, expiry is altitude, volatility is pressure, and gamma/vanna are winds. Marking one strike as resistance is useful only until the atmosphere moves.</p>
+  </div>
+</details>
+
+<details class="evidence">
+  <summary>Evidence and assumptions</summary>
+  <div class="ev-body">
+    <p class="muted">Sources and limitations governing this console.</p>
+    <ul><li><a href="https://youtu.be/4-aYHDpZH8Y?t=565" target="_blank" rel="noopener">Open interest, calendar expiries, and the reaction function (Option Alpha 9:25)</a></li><li><a href="https://youtu.be/4-aYHDpZH8Y?t=2886" target="_blank" rel="noopener">Basic positioning data is only a simplified view; track time and price (Option Alpha 48:06)</a></li><li><a href="https://youtu.be/fUDf7oKXc5Y?t=479" target="_blank" rel="noopener">Vanna/charm event-vol buyback mechanism (ReSolve Riffs 7:59)</a></li><li><a href="https://optionalpha.com/interviews/cem-karsan" target="_blank" rel="noopener">Full interview and transcript</a></li></ul>
+    <ul style="margin-top:10px"><li>data_source: CBOE SPX delayed option chain (~20 min lag)</li><li>oi_lag: Open interest typically T+1; not intraday flow</li><li>dealer_sign_convention: Call exposure positive, put exposure negative (dealer-side proxy)</li><li>vega_balance_note: net_vex is vega*OI*100 — vega balance, not vanna</li><li>vanna_model: Black-Scholes vanna from CBOE IV; r=0.04, q=0.013</li><li>vanna_0dte_time_floor: 0.5/365 year because exact time-to-close is unavailable</li><li>vanna_exposure_unit: Dollar notional per 1 IV percentage point (vanna*OI*100*spot*0.01)</li><li>scenario_matrix_note: Model proxy for estimated hedge demand — not observed dealer flow</li><li>inventory_unknown: True dealer inventory and trade direction not directly observable</li><li>charm: unavailable/unvalidated — not computed from theta</li></ul>
+  </div>
+</details>
+
+<footer>Computed locally from CBOE SPX chain · Scenario cells are model estimates · Vega balance is not vanna · Charm unavailable</footer>
+</div>
+
+<script>
+(function() {
+  var maxAbs = { gex: 0, dgex: 0, vanna: 0 };
+  document.querySelectorAll('.hm-cell').forEach(function(td) {
+    ['gex','dgex','vanna'].forEach(function(m) {
+      var v = parseFloat(td.getAttribute('data-' + m) || '0');
+      if (Math.abs(v) > maxAbs[m]) maxAbs[m] = Math.abs(v);
+    });
+  });
+  if (maxAbs.gex === 0) maxAbs.gex = 1;
+  if (maxAbs.dgex === 0) maxAbs.dgex = 1;
+  if (maxAbs.vanna === 0) maxAbs.vanna = 1;
+
+  function colorFor(val, mx) {
+    if (Math.abs(val) < 0.005) val = 0;
+    if (!mx || !val) return { bg: '#1a1a1a', fg: '#888', txt: '0.00B' };
+    var t = Math.min(Math.abs(val) / mx, 1);
+    var a = 0.15 + t * 0.75;
+    var sign = val >= 0 ? '+' : '';
+    var txt = sign + val.toFixed(2) + 'B';
+    if (val > 0) return { bg: 'rgba(90,143,176,' + a.toFixed(2) + ')', fg: '#d8d8d8', txt: txt };
+    return { bg: 'rgba(180,100,80,' + a.toFixed(2) + ')', fg: '#d8d8d8', txt: txt };
+  }
+
+  function applyMetric(metric) {
+    document.querySelectorAll('.hm-cell').forEach(function(td) {
+      var val = parseFloat(td.getAttribute('data-' + metric) || '0');
+      var c = colorFor(val, maxAbs[metric]);
+      td.style.background = c.bg;
+      td.style.color = c.fg;
+      td.textContent = c.txt;
+    });
+    document.querySelectorAll('.metric-btns button').forEach(function(btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-metric') === metric);
+    });
+  }
+
+  function applyAxis(axis) {
+    document.body.classList.remove('axis-strike', 'axis-pct');
+    document.body.classList.add(axis === 'pct' ? 'axis-pct' : 'axis-strike');
+    document.querySelectorAll('.axis-btns button').forEach(function(btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-axis') === axis);
+    });
+    var y = document.getElementById('hm-y-label');
+    var note = document.getElementById('hm-axis-note');
+    if (y) y.textContent = axis === 'pct' ? 'Moneyness' : '행사가';
+    if (note) {
+      note.textContent = axis === 'pct'
+        ? 'Y = 현물 대비 % · X = 만기 구간 · amber row = ATM · amber column = OPEX'
+        : 'Y = 실제 행사가 구간 (현물 대비) · X = 만기 구간 · amber row = ATM · amber column = OPEX';
+    }
+    try { localStorage.setItem('dealer-axis-unit', axis); } catch (e) {}
+  }
+
+  document.querySelectorAll('.metric-btns button').forEach(function(btn) {
+    btn.addEventListener('click', function() { applyMetric(btn.getAttribute('data-metric')); });
+  });
+  document.querySelectorAll('.axis-btns button').forEach(function(btn) {
+    btn.addEventListener('click', function() { applyAxis(btn.getAttribute('data-axis')); });
+  });
+
+  var saved = 'strike';
+  try { saved = localStorage.getItem('dealer-axis-unit') || 'strike'; } catch (e) {}
+  applyAxis(saved === 'pct' ? 'pct' : 'strike');
+
+  if (window.matchMedia('(max-width: 800px)').matches) {
+    var raw = document.querySelector('details.raw-data');
+    if (raw) raw.removeAttribute('open');
+  }
+})();
+</script>
+</body>
+</html>
