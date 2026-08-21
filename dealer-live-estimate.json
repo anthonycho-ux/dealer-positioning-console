@@ -1,84 +1,145 @@
 {
- "spot": 7785.7598,
- "generated_at": "2026-08-15T04:10:45",
- "baseline_net_gex_b": 0.87,
- "live_net_gex_b": 0.87,
+ "spot": 7641.1602,
+ "generated_at": "2026-08-21T07:00:08",
+ "baseline_net_gex_b": -0.32,
+ "live_net_gex_b": -0.32,
  "delta_net_gex_b": 0.0,
  "prints_total": 11916,
  "source_label": "tape /home/dev/.hermes/data/dealer-tape.jsonl",
  "strikes": [
   {
-   "strike": 7785.0,
-   "baseline_gex_b": 0.21,
-   "live_gex_b": 0.21,
-   "oi": 26302.0,
+   "strike": 7640.0,
+   "baseline_gex_b": -0.19,
+   "live_gex_b": -0.19,
+   "oi": 31226.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7645.0,
+   "baseline_gex_b": -0.17,
+   "live_gex_b": -0.17,
+   "oi": 13696.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7650.0,
+   "baseline_gex_b": -0.11,
+   "live_gex_b": -0.11,
+   "oi": 147028.0,
    "delta_gex_b": 0.0
   },
   {
    "strike": 7900.0,
-   "baseline_gex_b": 0.13,
-   "live_gex_b": 0.13,
-   "oi": 186974.0,
+   "baseline_gex_b": 0.07,
+   "live_gex_b": 0.07,
+   "oi": 182801.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7500.0,
+   "baseline_gex_b": -0.06,
+   "live_gex_b": -0.06,
+   "oi": 510917.0,
    "delta_gex_b": 0.0
   },
   {
    "strike": 7800.0,
-   "baseline_gex_b": 0.11,
-   "live_gex_b": 0.11,
-   "oi": 250296.0,
-   "delta_gex_b": 0.0
-  },
-  {
-   "strike": 7850.0,
-   "baseline_gex_b": 0.08,
-   "live_gex_b": 0.08,
-   "oi": 81384.0,
-   "delta_gex_b": 0.0
-  },
-  {
-   "strike": 8000.0,
-   "baseline_gex_b": 0.07,
-   "live_gex_b": 0.07,
-   "oi": 1799256.0,
+   "baseline_gex_b": 0.05,
+   "live_gex_b": 0.05,
+   "oi": 278657.0,
    "delta_gex_b": 0.0
   },
   {
    "strike": 8100.0,
-   "baseline_gex_b": 0.06,
-   "live_gex_b": 0.06,
-   "oi": 182952.0,
+   "baseline_gex_b": 0.05,
+   "live_gex_b": 0.05,
+   "oi": 165537.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 8000.0,
+   "baseline_gex_b": 0.05,
+   "live_gex_b": 0.05,
+   "oi": 1823682.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7400.0,
+   "baseline_gex_b": -0.05,
+   "live_gex_b": -0.05,
+   "oi": 344910.0,
    "delta_gex_b": 0.0
   },
   {
    "strike": 8200.0,
-   "baseline_gex_b": 0.06,
-   "live_gex_b": 0.06,
-   "oi": 194336.0,
-   "delta_gex_b": 0.0
-  },
-  {
-   "strike": 7950.0,
-   "baseline_gex_b": 0.05,
-   "live_gex_b": 0.05,
-   "oi": 78254.0,
-   "delta_gex_b": 0.0
-  },
-  {
-   "strike": 7750.0,
-   "baseline_gex_b": 0.05,
-   "live_gex_b": 0.05,
-   "oi": 153300.0,
-   "delta_gex_b": 0.0
-  },
-  {
-   "strike": 7825.0,
-   "baseline_gex_b": 0.05,
-   "live_gex_b": 0.05,
-   "oi": 52152.0,
+   "baseline_gex_b": 0.04,
+   "live_gex_b": 0.04,
+   "oi": 172842.0,
    "delta_gex_b": 0.0
   }
  ],
- "trajectory": [],
+ "trajectory": [
+  {
+   "step": 660,
+   "net_gex_b": -0.32
+  },
+  {
+   "step": 1560,
+   "net_gex_b": -0.32
+  },
+  {
+   "step": 1620,
+   "net_gex_b": -0.32
+  },
+  {
+   "step": 2040,
+   "net_gex_b": -0.32
+  },
+  {
+   "step": 2940,
+   "net_gex_b": -0.32
+  },
+  {
+   "step": 3000,
+   "net_gex_b": -0.32
+  },
+  {
+   "step": 360,
+   "net_gex_b": -0.32
+  },
+  {
+   "step": 1020,
+   "net_gex_b": -0.32
+  },
+  {
+   "step": 1080,
+   "net_gex_b": -0.32
+  },
+  {
+   "step": 1740,
+   "net_gex_b": -0.32
+  },
+  {
+   "step": 1800,
+   "net_gex_b": -0.32
+  },
+  {
+   "step": 2640,
+   "net_gex_b": -0.32
+  },
+  {
+   "step": 3000,
+   "net_gex_b": -0.32
+  },
+  {
+   "step": 5520,
+   "net_gex_b": -0.32
+  },
+  {
+   "step": 6060,
+   "net_gex_b": -0.32
+  }
+ ],
  "tape_sample": [
   {
    "i": 6176,

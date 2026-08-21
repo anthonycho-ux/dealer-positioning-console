@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Dealer Brief — 2026-08-14</title>
+<title>Dealer Brief — 2026-08-21</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif; background: #0d1117; color: #e6edf3; padding: 12px; -webkit-font-smoothing: antialiased; }
@@ -41,29 +41,29 @@
   <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:12px;">
     <div>
       <h1>🟢🔴 Dealer Brief</h1>
-      <div class="meta">2026-08-14 14:40:44 · CBOE 20-min delayed</div>
+      <div class="meta">2026-08-21 07:00:41 · CBOE 20-min delayed</div>
     </div>
     <span class="badge">🟢 POSITIVE</span>
   </div>
 
   <div class="trend-bar">
-    <span>GEX ⬇ -1.40B</span>
-    <span>SPX ⬇ -13</span>
-    <span></span>
+    <span>GEX ⬆ +0.88B</span>
+    <span>SPX ➡ +0</span>
+    <span> ⚠️ REGIME SWITCH</span>
   </div>
 
   <!-- Gamma Snapshot -->
   <div class="card">
-    <h2>📊 Gamma (Net $ +1.34B)</h2>
+    <h2>📊 Gamma (Net $ +0.27B)</h2>
     <div class="g2">
       <div class="m">
         <div class="l">SPX</div>
-        <div class="v">7,786</div>
+        <div class="v">7,641</div>
       </div>
       <div class="m">
         <div class="l">Gamma Flip</div>
-        <div class="v sm">$ 7,635</div>
-        <div class="sub">+1.94% </div>
+        <div class="v sm">$ 7,672</div>
+        <div class="sub">-0.40% ⚠️</div>
       </div>
       <div class="m">
         <div class="l">Call Wall</div>
@@ -82,28 +82,28 @@
       </div>
       <div class="m">
         <div class="l">Nearest Exp</div>
-        <div class="v sm">2026-08-14</div>
+        <div class="v sm">2026-08-21</div>
       </div>
     </div>
-    
+    <div class="warn">⚠️ SPX within 1% of Gamma Flip — small moves flip regime</div>
   </div>
 
   <!-- Vega balance, true Vanna + Delta GEX -->
   <div class="card">
     <h2>🔍 2nd-Order Greeks</h2>
     <div style="display:flex; gap:10px; align-items:center; margin-bottom:8px;">
-      <span class="badge" style="background:#d2992222; color:#d29922; border-color:#d2992255;"> VEGA BALANCE ($ +1.89B)</span>
+      <span class="badge" style="background:#d2992222; color:#d29922; border-color:#d2992255;"> VEGA BALANCE ($ +1.17B)</span>
     </div>
     <div class="g2">
       <div class="m">
         <div class="l">Delta-GEX (Gary model)</div>
-        <div class="v sm">$ +1.29B</div>
-        <div class="sub">vs Raw $ +1.34B · 96% effective</div>
+        <div class="v sm">$ +0.36B</div>
+        <div class="sub">vs Raw $ +0.27B · 133% effective</div>
       </div>
       <div class="m">
         <div class="l">Vega Balance / True Vanna</div>
-        <div class="v sm">$ +1.89B</div>
-        <div class="sub">Vanna $ +46.01B per 1 vol pt · Vega × open interest balance; sensitivity inventory, not vanna or observed flow.</div>
+        <div class="v sm">$ +1.17B</div>
+        <div class="sub">Vanna $ +51.08B per 1 vol pt · Vega × open interest balance; sensitivity inventory, not vanna or observed flow.</div>
       </div>
     </div>
   </div>
@@ -115,64 +115,64 @@
       <tr><th>Strike</th><th>Net GEX</th><th>C OI</th><th>P OI</th></tr>
       
         <tr>
-            <td class="strike">🟢 $ 7,785</td>
-            <td class="gex" style="color:#22c55e">$ +0.21B</td>
-            <td class="oi">18,244</td>
-            <td class="oi">8,058</td>
-        </tr>
-        <tr>
             <td class="strike">🟢 $ 7,900</td>
-            <td class="gex" style="color:#22c55e">$ +0.13B</td>
-            <td class="oi">161,893</td>
-            <td class="oi">25,081</td>
+            <td class="gex" style="color:#22c55e">$ +0.08B</td>
+            <td class="oi">151,612</td>
+            <td class="oi">25,415</td>
         </tr>
         <tr>
             <td class="strike">🟢 $ 7,800</td>
-            <td class="gex" style="color:#22c55e">$ +0.11B</td>
-            <td class="oi">160,731</td>
-            <td class="oi">89,565</td>
+            <td class="gex" style="color:#22c55e">$ +0.06B</td>
+            <td class="oi">180,895</td>
+            <td class="oi">103,536</td>
         </tr>
         <tr>
-            <td class="strike">🟢 $ 7,850</td>
-            <td class="gex" style="color:#22c55e">$ +0.08B</td>
-            <td class="oi">66,716</td>
-            <td class="oi">14,668</td>
-        </tr>
-        <tr>
-            <td class="strike">🟢 $ 8,000</td>
-            <td class="gex" style="color:#22c55e">$ +0.07B</td>
-            <td class="oi">968,607</td>
-            <td class="oi">830,649</td>
+            <td class="strike">🔴 $ 7,500</td>
+            <td class="gex" style="color:#ef4444">$ -0.06B</td>
+            <td class="oi">179,270</td>
+            <td class="oi">260,990</td>
         </tr>
         <tr>
             <td class="strike">🟢 $ 8,100</td>
             <td class="gex" style="color:#22c55e">$ +0.06B</td>
-            <td class="oi">173,270</td>
-            <td class="oi">9,682</td>
+            <td class="oi">160,563</td>
+            <td class="oi">10,097</td>
+        </tr>
+        <tr>
+            <td class="strike">🟢 $ 8,000</td>
+            <td class="gex" style="color:#22c55e">$ +0.05B</td>
+            <td class="oi">854,538</td>
+            <td class="oi">725,878</td>
         </tr>
         <tr>
             <td class="strike">🟢 $ 8,200</td>
-            <td class="gex" style="color:#22c55e">$ +0.06B</td>
-            <td class="oi">179,967</td>
-            <td class="oi">14,369</td>
+            <td class="gex" style="color:#22c55e">$ +0.05B</td>
+            <td class="oi">165,020</td>
+            <td class="oi">15,773</td>
         </tr>
         <tr>
-            <td class="strike">🟢 $ 7,950</td>
-            <td class="gex" style="color:#22c55e">$ +0.05B</td>
-            <td class="oi">72,074</td>
-            <td class="oi">6,180</td>
+            <td class="strike">🟢 $ 7,850</td>
+            <td class="gex" style="color:#22c55e">$ +0.04B</td>
+            <td class="oi">66,358</td>
+            <td class="oi">16,089</td>
         </tr>
         <tr>
-            <td class="strike">🟢 $ 7,750</td>
-            <td class="gex" style="color:#22c55e">$ +0.05B</td>
-            <td class="oi">94,260</td>
-            <td class="oi">59,040</td>
+            <td class="strike">🔴 $ 7,400</td>
+            <td class="gex" style="color:#ef4444">$ -0.04B</td>
+            <td class="oi">119,907</td>
+            <td class="oi">205,960</td>
         </tr>
         <tr>
-            <td class="strike">🟢 $ 7,825</td>
-            <td class="gex" style="color:#22c55e">$ +0.05B</td>
-            <td class="oi">38,311</td>
-            <td class="oi">13,841</td>
+            <td class="strike">🔴 $ 7,600</td>
+            <td class="gex" style="color:#ef4444">$ -0.04B</td>
+            <td class="oi">179,833</td>
+            <td class="oi">203,775</td>
+        </tr>
+        <tr>
+            <td class="strike">🟢 $ 8,050</td>
+            <td class="gex" style="color:#22c55e">$ +0.04B</td>
+            <td class="oi">90,344</td>
+            <td class="oi">4,115</td>
         </tr>
     </table>
   </div>
@@ -184,34 +184,34 @@
       <tr><th>Expiry</th><th>Net</th><th></th></tr>
       
         <tr>
-            <td>2026-08-21</td>
-            <td style="color:#22c55e">$ +0.31B</td>
+            <td>2026-12-31</td>
+            <td style="color:#22c55e">$ +0.30B</td>
             <td><div class="gex-bar" style="width:100%;background:#22c55e"></div></td>
         </tr>
         <tr>
-            <td>2026-12-31</td>
-            <td style="color:#22c55e">$ +0.27B</td>
-            <td><div class="gex-bar" style="width:89%;background:#22c55e"></div></td>
-        </tr>
-        <tr>
-            <td>2026-08-14</td>
-            <td style="color:#22c55e">$ +0.20B</td>
-            <td><div class="gex-bar" style="width:64%;background:#22c55e"></div></td>
+            <td>2026-08-24</td>
+            <td style="color:#ef4444">$ -0.08B</td>
+            <td><div class="gex-bar" style="width:28%;background:#ef4444"></div></td>
         </tr>
         <tr>
             <td>2026-09-18</td>
-            <td style="color:#22c55e">$ +0.16B</td>
-            <td><div class="gex-bar" style="width:51%;background:#22c55e"></div></td>
+            <td style="color:#22c55e">$ +0.08B</td>
+            <td><div class="gex-bar" style="width:26%;background:#22c55e"></div></td>
         </tr>
         <tr>
             <td>2026-12-18</td>
-            <td style="color:#22c55e">$ +0.06B</td>
-            <td><div class="gex-bar" style="width:20%;background:#22c55e"></div></td>
+            <td style="color:#22c55e">$ +0.04B</td>
+            <td><div class="gex-bar" style="width:15%;background:#22c55e"></div></td>
         </tr>
         <tr>
-            <td>2026-08-31</td>
-            <td style="color:#22c55e">$ +0.05B</td>
-            <td><div class="gex-bar" style="width:18%;background:#22c55e"></div></td>
+            <td>2026-08-21</td>
+            <td style="color:#22c55e">$ +0.04B</td>
+            <td><div class="gex-bar" style="width:15%;background:#22c55e"></div></td>
+        </tr>
+        <tr>
+            <td>2026-08-28</td>
+            <td style="color:#ef4444">$ -0.04B</td>
+            <td><div class="gex-bar" style="width:14%;background:#ef4444"></div></td>
         </tr>
     </table>
   </div>
@@ -222,20 +222,20 @@
     <div class="metric-grid">
       <div class="metric">
         <div class="label">MA20</div>
-        <div class="value small">$ 7,585</div>
+        <div class="value small">$ 7,631</div>
       </div>
       <div class="metric">
         <div class="label">Upper / Lower</div>
-        <div class="value small">$7,910 / $7,260</div>
+        <div class="value small">$7,939 / $7,324</div>
       </div>
       <div class="metric">
         <div class="label">Band Width</div>
-        <div class="value small">8.56%</div>
+        <div class="value small">8.06%</div>
         <div class="sub">Wide bands — high vol regime</div>
       </div>
       <div class="metric">
         <div class="label">Position</div>
-        <div class="value small">Near Upper Band ⬆️ (81%)</div>
+        <div class="value small">Mid-Band (neutral) (52%)</div>
       </div>
     </div>
   </div>
@@ -246,7 +246,7 @@
     <div class="tip">
       <p><strong>POSITIVE GAMMA.</strong> Dealers net long gamma. Hedging → counter-cyclical: buy dips, sell rallies. Vol compressed. Strategy: mean-reversion, fade extremes.</p>
       <p class="mt"><strong>🔍 VANNA PROXY.</strong> Modeled Vanna positive: under the stated proxy, falling IV implies estimated dealer buying. This is not observed flow.</p>
-      
+      <p class="mt"><strong>⚠️ FLIP RISK.</strong> SPX within 1% of Gamma Flip — small spot moves can switch the dealer regime instantaneously.</p>
       <hr class="divider">
       <p style="font-size:11px;color:#8b949e"><strong>📄 Delta-GEX:</strong> gamma × OI × |delta|, an adjusted exposure proxy. <strong>Vega balance:</strong> vega × OI; it is not Vanna. <strong>True Vanna:</strong> Black-Scholes ∂Δ/∂σ × OI, shown per 1 vol point under the stated call+/put− assumption.</p>
     </div>
