@@ -1,8 +1,8 @@
 {
- "spot": 7652.8599,
- "generated_at": "2026-08-25T07:00:06",
- "baseline_net_gex_b": 0.22,
- "live_net_gex_b": 0.22,
+ "spot": 7677.2798,
+ "generated_at": "2026-08-26T07:00:46",
+ "baseline_net_gex_b": 0.23,
+ "live_net_gex_b": 0.23,
  "delta_net_gex_b": 0.0,
  "prints_total": 11916,
  "source_label": "tape /home/dev/.hermes/data/dealer-tape.jsonl",
@@ -11,133 +11,133 @@
    "strike": 7900.0,
    "baseline_gex_b": 0.08,
    "live_gex_b": 0.08,
-   "oi": 177756.0,
+   "oi": 181954.0,
    "delta_gex_b": 0.0
   },
   {
    "strike": 7500.0,
    "baseline_gex_b": -0.07,
    "live_gex_b": -0.07,
-   "oi": 441324.0,
+   "oi": 443951.0,
    "delta_gex_b": 0.0
   },
   {
    "strike": 7800.0,
-   "baseline_gex_b": 0.06,
-   "live_gex_b": 0.06,
-   "oi": 245784.0,
+   "baseline_gex_b": 0.07,
+   "live_gex_b": 0.07,
+   "oi": 255831.0,
    "delta_gex_b": 0.0
   },
   {
    "strike": 8100.0,
    "baseline_gex_b": 0.05,
    "live_gex_b": 0.05,
-   "oi": 166217.0,
+   "oi": 167326.0,
    "delta_gex_b": 0.0
   },
   {
    "strike": 8000.0,
    "baseline_gex_b": 0.05,
    "live_gex_b": 0.05,
-   "oi": 1668015.0,
+   "oi": 1684821.0,
    "delta_gex_b": 0.0
   },
   {
    "strike": 8200.0,
    "baseline_gex_b": 0.05,
    "live_gex_b": 0.05,
-   "oi": 186400.0,
-   "delta_gex_b": 0.0
-  },
-  {
-   "strike": 7600.0,
-   "baseline_gex_b": -0.04,
-   "live_gex_b": -0.04,
-   "oi": 340161.0,
-   "delta_gex_b": 0.0
-  },
-  {
-   "strike": 7400.0,
-   "baseline_gex_b": -0.04,
-   "live_gex_b": -0.04,
-   "oi": 331116.0,
+   "oi": 189852.0,
    "delta_gex_b": 0.0
   },
   {
    "strike": 7750.0,
    "baseline_gex_b": 0.04,
    "live_gex_b": 0.04,
-   "oi": 166714.0,
+   "oi": 168610.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7400.0,
+   "baseline_gex_b": -0.04,
+   "live_gex_b": -0.04,
+   "oi": 334940.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7550.0,
+   "baseline_gex_b": -0.04,
+   "live_gex_b": -0.04,
+   "oi": 208509.0,
    "delta_gex_b": 0.0
   },
   {
    "strike": 7850.0,
    "baseline_gex_b": 0.04,
    "live_gex_b": 0.04,
-   "oi": 81320.0,
+   "oi": 83335.0,
    "delta_gex_b": 0.0
   }
  ],
  "trajectory": [
   {
    "step": 660,
-   "net_gex_b": 0.22
+   "net_gex_b": 0.23
   },
   {
    "step": 1560,
-   "net_gex_b": 0.22
+   "net_gex_b": 0.23
   },
   {
    "step": 1620,
-   "net_gex_b": 0.22
+   "net_gex_b": 0.23
   },
   {
    "step": 2040,
-   "net_gex_b": 0.22
+   "net_gex_b": 0.23
   },
   {
    "step": 2940,
-   "net_gex_b": 0.22
+   "net_gex_b": 0.23
   },
   {
    "step": 3000,
-   "net_gex_b": 0.22
+   "net_gex_b": 0.23
   },
   {
    "step": 360,
-   "net_gex_b": 0.22
+   "net_gex_b": 0.23
   },
   {
    "step": 1020,
-   "net_gex_b": 0.22
+   "net_gex_b": 0.23
   },
   {
    "step": 1080,
-   "net_gex_b": 0.22
+   "net_gex_b": 0.23
   },
   {
    "step": 1740,
-   "net_gex_b": 0.22
+   "net_gex_b": 0.23
   },
   {
    "step": 1800,
-   "net_gex_b": 0.22
+   "net_gex_b": 0.23
   },
   {
    "step": 2640,
-   "net_gex_b": 0.22
+   "net_gex_b": 0.23
   },
   {
    "step": 3000,
-   "net_gex_b": 0.22
+   "net_gex_b": 0.23
   },
   {
    "step": 5520,
-   "net_gex_b": 0.22
+   "net_gex_b": 0.23
   },
   {
    "step": 6060,
-   "net_gex_b": 0.22
+   "net_gex_b": 0.23
   }
  ],
  "tape_sample": [
