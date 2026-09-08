@@ -1,8 +1,8 @@
 {
  "spot": 7718.6001,
- "generated_at": "2026-09-07T07:00:51",
- "baseline_net_gex_b": 0.39,
- "live_net_gex_b": 0.39,
+ "generated_at": "2026-09-08T06:56:55",
+ "baseline_net_gex_b": 0.16,
+ "live_net_gex_b": 0.16,
  "delta_net_gex_b": 0.0,
  "prints_total": 11916,
  "source_label": "tape /home/dev/.hermes/data/dealer-tape.jsonl",
@@ -29,17 +29,17 @@
    "delta_gex_b": 0.0
   },
   {
-   "strike": 8100.0,
-   "baseline_gex_b": 0.06,
-   "live_gex_b": 0.06,
-   "oi": 186509.0,
-   "delta_gex_b": 0.0
-  },
-  {
    "strike": 8000.0,
    "baseline_gex_b": 0.06,
    "live_gex_b": 0.06,
    "oi": 1816040.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 8100.0,
+   "baseline_gex_b": 0.06,
+   "live_gex_b": 0.06,
+   "oi": 186509.0,
    "delta_gex_b": 0.0
   },
   {
@@ -50,10 +50,10 @@
    "delta_gex_b": 0.0
   },
   {
-   "strike": 7825.0,
-   "baseline_gex_b": 0.06,
-   "live_gex_b": 0.06,
-   "oi": 89310.0,
+   "strike": 7700.0,
+   "baseline_gex_b": -0.06,
+   "live_gex_b": -0.06,
+   "oi": 339597.0,
    "delta_gex_b": 0.0
   },
   {
@@ -64,10 +64,10 @@
    "delta_gex_b": 0.0
   },
   {
-   "strike": 7750.0,
-   "baseline_gex_b": 0.06,
-   "live_gex_b": 0.06,
-   "oi": 186036.0,
+   "strike": 7650.0,
+   "baseline_gex_b": -0.05,
+   "live_gex_b": -0.05,
+   "oi": 154978.0,
    "delta_gex_b": 0.0
   },
   {
