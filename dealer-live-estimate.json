@@ -1,31 +1,59 @@
 {
- "spot": 7718.6001,
- "generated_at": "2026-09-08T06:56:55",
- "baseline_net_gex_b": 0.16,
- "live_net_gex_b": 0.16,
+ "spot": 7673.52,
+ "generated_at": "2026-09-09T06:37:04",
+ "baseline_net_gex_b": -0.14,
+ "live_net_gex_b": -0.14,
  "delta_net_gex_b": 0.0,
  "prints_total": 11916,
  "source_label": "tape /home/dev/.hermes/data/dealer-tape.jsonl",
  "strikes": [
   {
-   "strike": 7800.0,
-   "baseline_gex_b": 0.1,
-   "live_gex_b": 0.1,
-   "oi": 269594.0,
-   "delta_gex_b": 0.0
-  },
-  {
-   "strike": 7900.0,
-   "baseline_gex_b": 0.08,
-   "live_gex_b": 0.08,
-   "oi": 175371.0,
+   "strike": 7670.0,
+   "baseline_gex_b": -0.09,
+   "live_gex_b": -0.09,
+   "oi": 29050.0,
    "delta_gex_b": 0.0
   },
   {
    "strike": 7500.0,
+   "baseline_gex_b": -0.09,
+   "live_gex_b": -0.09,
+   "oi": 455541.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7800.0,
+   "baseline_gex_b": 0.09,
+   "live_gex_b": 0.09,
+   "oi": 261008.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7680.0,
    "baseline_gex_b": -0.08,
    "live_gex_b": -0.08,
-   "oi": 460098.0,
+   "oi": 38311.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7900.0,
+   "baseline_gex_b": 0.07,
+   "live_gex_b": 0.07,
+   "oi": 170775.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 8100.0,
+   "baseline_gex_b": 0.06,
+   "live_gex_b": 0.06,
+   "oi": 185945.0,
+   "delta_gex_b": 0.0
+  },
+  {
+   "strike": 7550.0,
+   "baseline_gex_b": -0.06,
+   "live_gex_b": -0.06,
+   "oi": 214369.0,
    "delta_gex_b": 0.0
   },
   {
@@ -36,45 +64,17 @@
    "delta_gex_b": 0.0
   },
   {
-   "strike": 8100.0,
-   "baseline_gex_b": 0.06,
-   "live_gex_b": 0.06,
-   "oi": 186509.0,
-   "delta_gex_b": 0.0
-  },
-  {
-   "strike": 7550.0,
-   "baseline_gex_b": -0.06,
-   "live_gex_b": -0.06,
-   "oi": 226050.0,
+   "strike": 7600.0,
+   "baseline_gex_b": -0.05,
+   "live_gex_b": -0.05,
+   "oi": 347405.0,
    "delta_gex_b": 0.0
   },
   {
    "strike": 7700.0,
-   "baseline_gex_b": -0.06,
-   "live_gex_b": -0.06,
-   "oi": 339597.0,
-   "delta_gex_b": 0.0
-  },
-  {
-   "strike": 7850.0,
-   "baseline_gex_b": 0.06,
-   "live_gex_b": 0.06,
-   "oi": 90359.0,
-   "delta_gex_b": 0.0
-  },
-  {
-   "strike": 7650.0,
    "baseline_gex_b": -0.05,
    "live_gex_b": -0.05,
-   "oi": 154978.0,
-   "delta_gex_b": 0.0
-  },
-  {
-   "strike": 8050.0,
-   "baseline_gex_b": 0.05,
-   "live_gex_b": 0.05,
-   "oi": 124799.0,
+   "oi": 336805.0,
    "delta_gex_b": 0.0
   }
  ],
